@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 工具集展示</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #FAF8F5;
+      --card-bg: #FFFFFF;
+      --text: #2D2A26;
+      --text-muted: #8A8279;
+      --accent: #C4A484;
+      --accent-dark: #A68B6A;
+      --border: #E8E3DC;
+      --shadow: rgba(45, 42, 38, 0.06);
+      --design: linear-gradient(135deg, #E8D5C4 0%, #C4A484 100%);
+      --tech: linear-gradient(135deg, #D4DEE8 0%, #7BA3C4 100%);
+      --biz: linear-gradient(135deg, #E8E4D4 0%, #C4B484 100%);
+      --office: linear-gradient(135deg, #D4E8D8 0%, #7BC49B 100%);
+      --human: linear-gradient(135deg, #E8D4D4 0%, #C48484 100%);
+    }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    /* Search */
+    .search-wrap {
+      max-width: 600px;
+      margin: 1.5rem auto 0;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.9rem 1.2rem 0.9rem 3rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--bg);
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(196, 164, 132, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-btn {
+      font-family: inherit;
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 50px;
+      transition: all 0.25s;
+    }
+
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Main Grid */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .masonry {
+      columns: 4;
+      column-gap: 1.2rem;
+    }
+
+    @media (max-width: 1100px) { .masonry { columns: 3; } }
+    @media (max-width: 800px) { .masonry { columns: 2; } }
+    @media (max-width: 500px) { .masonry { columns: 2; column-gap: 0.8rem; } main { padding: 1rem 0.8rem; } }
+
+    /* Card */
+    .card {
+      break-inside: avoid;
+      margin-bottom: 1.2rem;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(45, 42, 38, 0.12);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-body { padding: 1rem; }
+
+    .card-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+
+    .card-tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      background: var(--bg);
+      color: var(--text-muted);
+    }
+
+    .card-tag.primary { background: var(--accent); color: #fff; }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.8rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 2px; }
+    .card-link { font-size: 0.75rem; color: var(--accent); text-decoration: none; }
+    .card-link:hover { color: var(--accent-dark); text-decoration: underline; }
+
+    /* Empty / Stats */
+    .stats { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.85rem; }
+    .empty { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .modal.active { display: flex; }
+    .modal-box {
+      max-width: 700px;
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .modal-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    .modal-info { padding: 1.5rem; }
+    .modal-title { font-family: 'Noto Serif SC', serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .modal-desc { color: var(--text-muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI 工具集</h1>
+    <p>探索人工智能的无限可能</p>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索工具名称、类型或描述...">
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="设计">设计</button>
+    <button class="filter-btn" data-filter="科技">科技</button>
+    <button class="filter-btn" data-filter="商业">商业</button>
+    <button class="filter-btn" data-filter="办公">办公</button>
+    <button class="filter-btn" data-filter="人文">人文</button>
+  </div>
+
+  <main>
+    <div class="stats" id="stats"></div>
+    <div class="masonry" id="grid"></div>
+    <div class="empty" id="empty" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <p>未找到匹配的工具</p>
+    </div>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <img class="modal-img" id="modalImg" src="" alt="">
+      <div class="modal-info">
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-desc" id="modalDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const allVideos = [
+      {"id":1,"name":"recraft ai","type":"设计","category":"文生图","description":"（付费）多图拼接、ai文生图","url":"https://www.recraft.ai/","imageToken":"Xhc3bCO8Yoa3ooxtZ3EcZ3nHnEf","rating":4,"updateTime":"2025-09-01"},
+      {"id":2,"name":"napkin Ai","type":"设计","category":"文生信息化","description":"信息可视化表达","url":"https://www.napkin.ai/","imageToken":"P82IbVDlvoOG8Cxl1uOcPySrnHh","rating":4,"updateTime":"2025-09-01"},
+      {"id":3,"name":"通义灵码ai机器人","type":"科技","category":"文生程序","description":"通过提需求让代码进行物理引擎仿真","url":"https://lingma.aliyun.com/","imageToken":"YfDbbB19LoqH2uxwwAJcrGzLnIg","rating":4,"updateTime":"2025-09-01"},
+      {"id":4,"name":"豆包","type":"科技","category":"大语言模型","description":"大语言模型及ai绘图","url":"https://www.doubao.com/chat/","imageToken":"PEy3bEVfUoJEzexQlzlcqFLCnjc","rating":5,"updateTime":"2025-09-09"},
+      {"id":5,"name":"deepseek","type":"科技","category":"大语言模型","description":"根据参考内容和设问，文字回答","url":"https://www.deepseek.com/","imageToken":"L1fXbCSBzoxPgpxceLEc3gOLnQb","rating":5,"updateTime":"2025-09-01"},
+      {"id":6,"name":"即梦Ai2.0","type":"商业","category":"文生视频","description":"文生文，文生图，文生视频","url":"https://jimeng.jianying.com/ai-tool/home/","imageToken":"PSWAb3lXtoVRNfxV6qHcWTANnKU","rating":5,"updateTime":"2026-02-11"},
+      {"id":7,"name":"可灵Ai","type":"商业","category":"文生视频","description":"文生文，文生图，文生视频（首尾帧图生视频）","url":"https://app.klingai.com/cn/","imageToken":"F2qpbf8ysoSRQMxPL64cxciznOb","rating":4,"updateTime":"2025-09-01"},
+      {"id":8,"name":"ollama","type":"科技","category":"大语言模型平台","description":"本地部署大语言模型","url":"https://ollama.com/","imageToken":"VRWRbi32KoSKDixRoaZckqs0nMb","rating":4,"updateTime":"2025-09-01"},
+      {"id":9,"name":"chatbox","type":"科技","category":"大语言模型平台","description":"对ollama进行可视化表达","url":"https://chatboxai.app/zh","imageToken":"FIZIbDFllozmcGxZYCwcdRo1n7d","rating":5,"updateTime":"2025-09-01"},
+      {"id":10,"name":"github","type":"科技","category":"开源软件平台","description":"开源软件下载","url":"https://github.com/","imageToken":null,"rating":5,"updateTime":"2025-09-01"},
+      {"id":11,"name":"cloudflare","type":"商业","category":"云服务器","description":"将做好的内容部署到公网","url":"https://www.cloudflare.com/zh-cn/","imageToken":"IOLZbBx4WoTWlKxchLtcPhwNnxf","rating":3,"updateTime":"2025-09-01"},
+      {"id":12,"name":"cursor","type":"科技","category":"AI开发软件","description":"通过html与figma联动","url":"https://www.cursor.com/","imageToken":"IF8QbnnFLo7KNFxmi6WcZJoGnbf","rating":4,"updateTime":"2025-09-01"},
+      {"id":13,"name":"cursor-mcp","type":"科技","category":"mcp服务","description":"查找cursor相关的mcp软件服务","url":"https://cursor.directory/mcp","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":14,"name":"draw.io","type":"设计","category":"图表生成","description":"生成科研流程图，结合DeepSeek","url":"https://www.draw.io/","imageToken":"OeoxbEiVUoSEGIxw8g8ccivNnRe","rating":4,"updateTime":"2025-09-01"},
+      {"id":15,"name":"aippt","type":"办公","category":"文生ppt","description":"根据提示词去做PPT","url":"https://www.aippt.cn/","imageToken":null,"rating":3,"updateTime":"2025-09-01"},
+      {"id":16,"name":"Google aistudio","type":"设计","category":"图生图","description":"动漫、文创自然语言连续改图","url":"https://aistudio.google.com/","imageToken":"WsE0blAe8oL9M7xzyKUcKBOOnFc","rating":3,"updateTime":"2025-09-01"},
+      {"id":17,"name":"通义(阿里大模型)","type":"办公","category":"文生思维脑图","description":"会议实时转文字，后自动转为思维导图","url":"https://tongyi.aliyun.com/welcome","imageToken":"UZjFbuaTcoPZjOxIiTtckrmmn5f","rating":4,"updateTime":"2025-09-01"},
+      {"id":18,"name":"字节方舟知识库","type":"人文","category":"个人知识库","description":"支持快速搭建和多模态能力","url":"https://console.volcengine.com/ark/","imageToken":"FVl1bzK45o6JckxmrB0cjPR1ndb","rating":0,"updateTime":"2025-09-01"},
+      {"id":19,"name":"腾讯云数字人","type":"商业","category":"数字人","description":"AI口播","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":20,"name":"飞书","type":"科技","category":"信息整理","description":"多维表格信息整理","url":"","imageToken":"S0XnbxjZWoJob3xjNNWch6n8nhd","rating":5,"updateTime":"2025-09-01"},
+      {"id":21,"name":"coze数字人","type":"商业","category":"数字人","description":"利用工作流搭建数字人分身","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":22,"name":"钉钉短视频工作流","type":"科技","category":"数字人","description":"短视频工作流","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":23,"name":"flowith","type":"科技","category":"大语言模型","description":"画布式多线程AI交互体验（写论文推荐）","url":"https://flowith.io/blank","imageToken":"UjVtbtIeaoZRfFxPyW4c9v14nSf","rating":5,"updateTime":"2025-09-01"},
+      {"id":24,"name":"阿里百炼大模型","type":"科技","category":"个人知识库","description":"上传PDF制作个人知识库","url":"https://bailian.console.aliyun.com/","imageToken":"JqFKb967SoKqmfxGjvJcr8XInTc","rating":4,"updateTime":"2025-09-01"},
+      {"id":25,"name":"chatgpt 4O","type":"科技","category":"图生图","description":"一句话生成和修改高质量图","url":"https://chatgpt.com/","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":26,"name":"AI工具集","type":"科技","category":"AI工具集合","description":"根据不同场景寻找需要的AI软件","url":"https://ai-bot.cn/","imageToken":"Ozx8bnhYro0XKgxKsqFcoRhhnre","rating":5,"updateTime":"2025-09-01"},
+      {"id":27,"name":"SparkTTS","type":"科技","category":"声音克隆","description":"克隆自己的声音","url":"https://github.com/SparkAudio/Spark-TTS","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":28,"name":"Genspark超级智能体","type":"科技","category":"智能体","description":"AI agent","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":29,"name":"obsidian大学英语词典","type":"人文","category":"个人知识库","description":"将单词通过分类的方式进行相互连接","url":"https://publish.obsidian.md/","imageToken":"ZlrEbEDiboygPTx3da8cNwlZnLg","rating":5,"updateTime":"2025-09-01"},
+      {"id":30,"name":"obsidian知识库","type":"人文","category":"个人知识库","description":"个人本地化知识库，卡片笔记","url":"https://obsidian.md/","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":31,"name":"魔搭社区","type":"科技","category":"开发者社区","description":"阿里系开源社区，mcp和大模型使用","url":"https://www.modelscope.cn/","imageToken":"LxrSbYAKBoHRUlxxOb0c54Dxnug","rating":4,"updateTime":"2025-09-01"},
+      {"id":32,"name":"instant datascraper","type":"科技","category":"爬取数据","description":"谷歌商店下载，住所数据","url":"https://chromewebstore.google.com/","imageToken":"Gywnb78kioq1mhxeT3ycxayEno5","rating":5,"updateTime":"2025-09-01"},
+      {"id":33,"name":"kaggle","type":"科技","category":"爬取数据","description":"机器学习平台，提供大数据爬取","url":"https://www.kaggle.com/","imageToken":"Ag8ib5qYuokawtxuUK2cOQHDnie","rating":4,"updateTime":"2025-09-01"},
+      {"id":34,"name":"talkme","type":"人文","category":"口语练习","description":"和数字人练习，查看口语并纠错","url":"https://www.talkme.ai/","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":35,"name":"扣子空间","type":"科技","category":"agent","description":"字节版manus，让AI自己找资料并整合","url":"https://space.coze.cn/","imageToken":"RUsnb9p9boU8fNxt9E4cHdtWnyh","rating":5,"updateTime":"2026-01-13"},
+      {"id":36,"name":"coze机器人","type":"科技","category":"agent","description":"字节扣子agent","url":"https://space.coze.cn/task/","imageToken":null,"rating":0,"updateTime":""},
+      {"id":37,"name":"Teachable Machine","type":"科技","category":"机器学习","description":"通过设计动作、声音、行为训练机器","url":"https://teachablemachine.withgoogle.com/","imageToken":"WagdbGbTIogCvMxnEEpc4FcEnpc","rating":4,"updateTime":"2025-09-01"},
+      {"id":38,"name":"ollama","type":"科技","category":"AI本地部署","description":"将AI部署在自己的电脑上","url":"https://ollama.com/search","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":39,"name":"AutoDL算力云","type":"科技","category":"云服务器","description":"国内便宜的服务器，几块钱1小时","url":"https://www.autodl.com/login","imageToken":null,"rating":4,"updateTime":"2025-09-01"},
+      {"id":40,"name":"Android studio","type":"科技","category":"开发平台","description":"手机开发平台，安装AI到平台","url":"","imageToken":"SirIbQlDUolLpKxieCbc3AEJnlg","rating":4,"updateTime":"2025-09-01"},
+      {"id":41,"name":"阿奇索交易平台","type":"商业","category":"交易中间平台","description":"虚拟商品自动发货中间平台","url":"https://www.agiso.com/","imageToken":"SXH5bZlnWopsSQxPbdBc13DLnRe","rating":4,"updateTime":"2025-09-01"},
+      {"id":42,"name":"glean","type":"科技","category":"RAG","description":"RAG的top1，to B","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":43,"name":"知识星球","type":"科技","category":"信息教程","description":"获得教程、开发信息","url":"https://wx.zsxq.com/group/","imageToken":"Bv5bb457PoBuTMxuc7hcUtfEnt5","rating":4,"updateTime":"2025-09-01"},
+      {"id":44,"name":"Red推荐词搜索采集","type":"科技","category":"爬取数据","description":"根据一级关键词爬取Red抖音关键词","url":"https://mp.weixin.qq.com/","imageToken":"Li5abyGmAolMj5xZCB0c3QZpnIf","rating":4,"updateTime":"2025-09-01"},
+      {"id":45,"name":"Redbook collect","type":"科技","category":"爬取数据","description":"做对标账号分析","url":"https://wx.zsxq.com/group/","imageToken":"T9HCbcUAVoLBRqxAw9BcTTr2nOe","rating":4,"updateTime":"2025-09-01"},
+      {"id":46,"name":"飞书开放平台","type":"科技","category":"开发平台","description":"为外来插件提供飞书的ID和api秘钥","url":"https://open.feishu.cn/app","imageToken":"ZFOgbfzBWopJQhxoyUFcvcJZnHg","rating":4,"updateTime":"2025-09-01"},
+      {"id":47,"name":"unity","type":"设计","category":"游戏开发平台","description":"可交互式数字技术工业4.0/元宇宙/游戏","url":"https://unity.com/cn","imageToken":"D1PgbN7KyoUyxaxkwRhcLxpunGg","rating":4,"updateTime":"2025-09-01"},
+      {"id":48,"name":"capwords","type":"人文","category":"学外语","description":"像宝可梦搜集，将身边事物拍照获得中英语","url":"https://capwords.app/","imageToken":"RX7zbyF8No9ZM6xHjZncLl3RnHf","rating":4,"updateTime":"2025-09-01"},
+      {"id":49,"name":"coze","type":"科技","category":"工作流","description":"利用工作流自定义自己的AI工具","url":"","imageToken":"Wn0cbLg6DoXAGXx7VcfcfQeHn6b","rating":4,"updateTime":"2025-09-01"},
+      {"id":50,"name":"豆包电脑版","type":"科技","category":"内容简化","description":"AI浏览内容通俗化，转化成博客","url":"https://www.doubao.com/download/desktop","imageToken":"DKoRb54iWo3FSZxBfSvcNSk1nkc","rating":5,"updateTime":"2025-09-01"},
+      {"id":51,"name":"RUNOOB.COM","type":"科技","category":"代码学习","description":"网站快速学习代码相关知识","url":"https://www.runoob.com/","imageToken":"GB36bd1RDoE1sXxk7KKcGa8Bnfe","rating":4,"updateTime":"2025-09-01"},
+      {"id":52,"name":"JYSHARE.com","type":"科技","category":"AI工具集合","description":"将设计、代码等多个网站整合到一起","url":"https://www.jyshare.com/","imageToken":"G7kybqj3BozC7Bx3AoUcn0SonWh","rating":3,"updateTime":"2025-09-01"},
+      {"id":53,"name":"人机协同工作策略","type":"科技","category":"人机协同","description":"人为拆分任务→agent解决小任务→人和AI检查","url":"","imageToken":"IF16bbAxmodf1dxj9qzcJAKSnGh","rating":4,"updateTime":"2025-09-01"},
+      {"id":54,"name":"MINIMAX语音","type":"科技","category":"AI合成声音","description":"输入文稿，语音合成，音色设计","url":"https://www.minimaxi.com/audio","imageToken":"FPGrbSpW2ojhKUxipgdciWxVnDd","rating":4,"updateTime":"2025-09-01"},
+      {"id":55,"name":"豆包p图","type":"科技","category":"P图","description":"通过修改提示词把图片内容进行修改","url":"","imageToken":"BWUfbbAkqo5O2uxMuv5ci16inJa","rating":4,"updateTime":"2025-09-01"},
+      {"id":56,"name":"youware","type":"科技","category":"文生网站","description":"根据文字生成可以看到的网站","url":"https://www.youware.com/","imageToken":"XcxgbpJ1AoxkRuxdSQacB0EXnmN","rating":5,"updateTime":"2025-09-01"},
+      {"id":57,"name":"安诊儿","type":"科技","category":"医疗","description":"浙江省医院检测报告AI解读，就诊导诊","url":"","imageToken":"AJZcbOYeIosDbCxaBiUcHYOzn7e","rating":4,"updateTime":"2025-09-01"},
+      {"id":58,"name":"grok4","type":"科技","category":"大语言模型","description":"最强大的大语言模型，马斯克出品","url":"https://x.ai/grok","imageToken":"BNLHbKM7xo2BpvxQc8ocCoZInVh","rating":4,"updateTime":"2025-09-01"},
+      {"id":59,"name":"Chronos","type":"人文","category":"交互式学历史","description":"看不同时期的世界各地历史事件","url":"https://www.chronas.org/","imageToken":"DvYwbVfTiolyIrxgL7xcJV46nOg","rating":4,"updateTime":"2025-09-01"},
+      {"id":60,"name":"parse.bot","type":"科技","category":"爬取数据","description":"把任何网站变成api","url":"","imageToken":null,"rating":0,"updateTime":"2025-09-01"},
+      {"id":61,"name":"workout.tool","type":"人文","category":"健身","description":"个性化健身AI，健身指导，BMI统计","url":"","imageToken":"EMNMbXw3botHO1x8kyccnOWpn8c","rating":4,"updateTime":"2025-09-01"},
+      {"id":62,"name":"cursor","type":"科技","category":"写作","description":"自动补全工具，Tab键智能补全","url":"","imageToken":"Q3GYbcXr9ouUrRxhYZ2cw1penXg","rating":4,"updateTime":"2025-09-01"},
+      {"id":63,"name":"claude code","type":"科技","category":"AI编程","description":"说白话提需求，让AI写软件","url":"","imageToken":"VkQYb8HRWokPqMxPsRrcqxFpnxd","rating":0,"updateTime":"2025-09-01"},
+      {"id":64,"name":"storytribe","type":"设计","category":"故事板","description":"选择不同发型动作的人物和场景图制作故事板","url":"https://storytribeapp.com/","imageToken":"Gl5vbKnQHoCwzAx8Mp5cbSbSn6d","rating":0,"updateTime":"2025-09-01"},
+      {"id":65,"name":"nano banana AI","type":"设计","category":"故事板","description":"把多个图片合到一张图里，图片一致性强","url":"https://aistudio.google.com/","imageToken":"Vjqub5DdvoZmD3x8QF0cciofn0d","rating":4,"updateTime":"2025-09-01"},
+      {"id":66,"name":"苹果手表呼唤deepseek","type":"科技","category":"手机手表快捷指令","description":"苹果快捷助手结合硅基流动的Deepseek API","url":"https://www.icloud.com/shortcuts/","imageToken":"EU9vbUBQuoAIP4xlOyac6R4InEb","rating":4,"updateTime":"2025-09-01"},
+      {"id":67,"name":"index TTS2","type":"设计","category":"声音克隆","description":"电脑本地语音合成，给视频AI配音","url":"","imageToken":"AxAtbRyQDo5YO9xUji7cVQjXnSX","rating":0,"updateTime":"2025-09-13"},
+      {"id":68,"name":"DeepL","type":"人文","category":"文本翻译","description":"高质量翻译，最大限度保留排版格式","url":"https://www.deepl.com/en/translator/files","imageToken":"YJxXb1eZvoXGn2xf806cpS6Pn1c","rating":5,"updateTime":"2025-09-18"},
+      {"id":69,"name":"沉浸式翻译","type":"人文","category":"文本翻译","description":"接近免费的中高质量翻译","url":"https://app.immersivetranslate.com/","imageToken":"VJ97bifWHoeCYjxeXivcUr1nnxf","rating":4,"updateTime":"2025-09-18"},
+      {"id":70,"name":"aigcrank","type":"科技","category":"人工智能排名","description":"将各类AI软件做成排名","url":"https://aigcrank.cn/","imageToken":"CExdbPwzOo6DQHxN939cFcVVnjh","rating":5,"updateTime":"2025-09-20"},
+      {"id":71,"name":"亿企点评","type":"商业","category":"找工作","description":"大数据爬取求职官网信息，更新快","url":"","imageToken":"RWPrbt7heoHSn2xtiPQcxfEXnhb","rating":4,"updateTime":"2025-09-21"},
+      {"id":72,"name":"TheTaWave AI","type":"人文","category":"AI快速学知识","description":"上传文档或视频链接，建立思维框架和知识卡片","url":"https://thetawave.ai/app/notes","imageToken":"JaQbbr4iuomIDmxtXJvckEXTnNp","rating":4,"updateTime":"2025-09-23"},
+      {"id":73,"name":"NaVTO.AI","type":"科技","category":"AI工具集合","description":"AI工具目录，通过导航找到需要的AI","url":"https://www.navto.ai/zh","imageToken":"U4JRblchwoy93Kxgfxdc2ckenNd","rating":4,"updateTime":"2025-09-23"},
+      {"id":74,"name":"欧易","type":"商业","category":"购买海外软件服务","description":"通过欧易将rmb转换成虚拟币充值","url":"https://www.hgkuou.info/","imageToken":"KFhmbb4wOoTcloxUJxscL3TKnxg","rating":0,"updateTime":"2025-09-23"},
+      {"id":75,"name":"womp","type":"科技","category":"三维建模","description":"在线多人建模的三维软件","url":"https://beta.womp.com/discover","imageToken":"BZ5CbPssNoit7bxbE2qciLOQnWc","rating":4,"updateTime":"2025-10-15"},
+      {"id":76,"name":"Textlin Tools","type":"办公","category":"ocr识别","description":"将图片型的大文本pdf识别成markdown格式","url":"https://www.textin.com/","imageToken":"QymKbIMhdoiZylxUgj9cMWeNnuh","rating":4,"updateTime":"2025-10-24"},
+      {"id":77,"name":"Rodin AI","type":"科技","category":"图生三维模型","description":"图生三维模型，能拓扑，能烘焙法线","url":"https://hyper3d.ai","imageToken":"UFEfb2XJaoNpw9xnK8Icr6aVnAd","rating":4,"updateTime":"2025-10-25"},
+      {"id":78,"name":"gptzero","type":"科技","category":"论文AI率检测","description":"检查学生作业是否用AI写出","url":"","imageToken":"KKRIbddlCoWRLZx1wLGc8EPyndc","rating":4,"updateTime":"2025-12-03"},
+      {"id":79,"name":"notebookLM","type":"科技","category":"文生ppt","description":"通过提示词或上传文件生成演示文稿","url":"","imageToken":null,"rating":5,"updateTime":"2025-12-09"},
+      {"id":80,"name":"钉钉AI听记","type":"科技","category":"录音","description":"AI速记把音频转化为文字，整理会议重点","url":"","imageToken":"F9JGb2qYto3B4wxDfcHcua9cn1c","rating":5,"updateTime":"2025-12-14"},
+      {"id":81,"name":"亲爱的翻译官","type":"科技","category":"线上面试","description":"实时翻译，如zoom老外说话高精翻译","url":"https://www.itourtranslator.com/","imageToken":"WBFLbEro0oKksCxQBByciwrNn3g","rating":5,"updateTime":"2025-12-18"},
+      {"id":82,"name":"CLI Anything","type":"科技","category":"github","description":"claude code控制软件的中间遥控器","url":"https://hkuds.github.io/CLI-Anything/","imageToken":"TGksb03caosVV1x68tWc0ck5nUp","rating":4,"updateTime":"2026-03-24"},
+      {"id":83,"name":"ai咨询","type":"科技","category":"AI每日信息","description":"每天最重要的三条信息","url":"https://ai-digest.liziran.com/zh/","imageToken":"OOXfbJJHPoYOWVx5JA2cPFvOnid","rating":4,"updateTime":"2026-04-03"}
+    ];
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    function getGradient(type) {
+      const gradients = {
+        '设计': 'linear-gradient(135deg, #E8D5C4 0%, #C4A484 100%)',
+        '科技': 'linear-gradient(135deg, #D4DEE8 0%, #7BA3C4 100%)',
+        '商业': 'linear-gradient(135deg, #E8E4D4 0%, #C4B484 100%)',
+        '办公': 'linear-gradient(135deg, #D4E8D8 0%, #7BC49B 100%)',
+        '人文': 'linear-gradient(135deg, #E8D4D4 0%, #C48484 100%)'
+      };
+      return gradients[type] || 'linear-gradient(135deg, #E8E3DC 0%, #C4C4C4 100%)';
+    }
+
+    function getIcon(type) {
+      const icons = {
+        '设计': '🎨', '科技': '⚡', '商业': '💼', '办公': '📊', '人文': '📚'
+      };
+      return icons[type] || '🔧';
+    }
+
+    function getStars(rating) {
+      const n = rating || 0;
+      return '★'.repeat(n) + '☆'.repeat(5 - n);
+    }
+
+    function createCard(video) {
+      const grad = getGradient(video.type);
+      const icon = getIcon(video.type);
+      const initials = video.name.slice(0, 2).toUpperCase();
+
+      return '<div class="card" onclick="openModal(' + video.id + ')">' +
+        '<div class="card-img" style="background:' + grad + ';display:flex;align-items:center;justify-content:center;">' +
+        '<span style="font-size:2.5rem;color:rgba(255,255,255,0.9);">' + icon + '</span></div>' +
+        '<div class="card-body">' +
+        '<h3 class="card-title">' + video.name + '</h3>' +
+        '<div class="card-tags">' +
+        (video.type ? '<span class="card-tag primary">' + video.type + '</span>' : '') +
+        (video.category ? '<span class="card-tag">' + video.category + '</span>' : '') +
+        '</div>' +
+        (video.description ? '<p class="card-desc">' + video.description + '</p>' : '') +
+        '<div class="card-footer">' +
+        '<span class="card-stars">' + getStars(video.rating) + '</span>' +
+        (video.url ? '<a href="' + video.url + '" target="_blank" class="card-link" onclick="event.stopPropagation()">访问 →</a>' : '') +
+        '</div></div></div>';
+    }
+
+    function render() {
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      const stats = document.getElementById('stats');
+
+      let filtered = allVideos;
+
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(v => v.type === currentFilter);
+      }
+
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(v =>
+          v.name.toLowerCase().includes(q) ||
+          (v.type && v.type.toLowerCase().includes(q)) ||
+          (v.category && v.category.toLowerCase().includes(q)) ||
+          (v.description && v.description.toLowerCase().includes(q))
+        );
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        stats.textContent = '';
+        return;
+      }
+
+      empty.style.display = 'none';
+      stats.textContent = currentFilter === 'all' && !searchQuery
+        ? '共 ' + filtered.length + ' 个工具'
+        : '筛选结果：' + filtered.length + ' 个工具';
+      grid.innerHTML = filtered.map(createCard).join('');
+    }
+
+    function openModal(id) {
+      const v = allVideos.find(x => x.id === id);
+      if (!v) return;
+
+      const modal = document.getElementById('modal');
+      document.getElementById('modalImg').style.cssText = 'width:100%;aspect-ratio:16/9;object-fit:cover;background:' + getGradient(v.type) + ';display:flex;align-items:center;justify-content:center;';
+      document.getElementById('modalImg').outerHTML = '<div style="width:100%;aspect-ratio:16/9;background:' + getGradient(v.type) + ';display:flex;align-items:center;justify-content:center;"><span style="font-size:4rem;color:rgba(255,255,255,0.9);">' + getIcon(v.type) + '</span></div>';
+      document.getElementById('modalTitle').textContent = v.name;
+      document.getElementById('modalDesc').textContent = v.description || '';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchQuery = e.target.value.trim();
+      render();
+    });
+
+    document.getElementById('modal').addEventListener('click', e => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    render();
+  </script>
+</body>
+</html>
