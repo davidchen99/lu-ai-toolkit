@@ -374,6 +374,69 @@
       flex-shrink: 0;
     }
 
+    .maintenance-section {
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 2px 12px var(--shadow);
+      padding: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .maintenance-section.active {
+      display: block;
+    }
+
+    .maintenance-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin: 0.8rem 0 1rem;
+    }
+
+    .maintenance-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      padding: 0.8rem;
+    }
+
+    .maintenance-label {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .maintenance-value {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .maintenance-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .maintenance-record {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 0.7rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .maintenance-record strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
     /* Empty / Stats */
     .stats {
       display: grid;
@@ -539,6 +602,7 @@
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .featured-grid, .scene-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .scene-nav { grid-template-columns: 1fr; }
+      .maintenance-grid, .maintenance-list { grid-template-columns: 1fr; }
       .section-head, .scene-banner { align-items: flex-start; flex-direction: column; }
       .modal { padding: 0.8rem; }
     }
@@ -565,6 +629,7 @@
     <select class="control-select" id="ratingFilter"></select>
     <select class="control-select" id="sortSelect"></select>
     <button class="filter-btn" id="clearFilters">清空筛选</button>
+    <button class="filter-btn" id="maintenanceToggle">维护状态</button>
   </div>
 
   <main>
@@ -588,6 +653,7 @@
       <div class="scene-nav" id="sceneNav"></div>
     </section>
     <section class="section scene-results" id="sceneResults"></section>
+    <section class="maintenance-section" id="maintenanceSection"></section>
     <section class="section" id="listSection">
       <div class="section-head">
         <div>
@@ -875,6 +941,12 @@
     };
 
     let currentItems = [];
+    let syncStatus = {
+      source: '内置静态数据',
+      syncedAt: '',
+      warning: ''
+    };
+    let manualFeatured = new Set(JSON.parse(localStorage.getItem('manualFeaturedItems') || '[]'));
 
     function escapeHTML(value) {
       return String(value || '').replace(/[&<>"']/g, char => ({
@@ -969,6 +1041,7 @@
     }
 
     function classifyLevel(item) {
+      if (manualFeatured.has(item.uid)) return '精选';
       if (item.date && dateAgeDays(item.date) > 365) return '归档';
       if (item.status && /未使用|尝试未成功/.test(item.status)) return '待验证';
       if (!item.rating && item.module !== 'workflows') return '待验证';
@@ -990,6 +1063,12 @@
     function rankScore(item) {
       const levelWeight = { '精选': 400, '常用': 250, '待验证': 80, '归档': 10 }[item.level] || 0;
       return levelWeight + (item.rating || 0) * 25 + item.completenessScore;
+    }
+
+    function refreshLevels() {
+      allItems().forEach(item => {
+        item.level = classifyLevel(item);
+      });
     }
 
     function getGradient(type) {
@@ -1126,6 +1205,11 @@
         const payload = await response.json();
         const data = payload && payload.data;
         if (!data || !Array.isArray(data.tools)) return;
+        syncStatus = {
+          source: payload.source || data.source || '远程同步',
+          syncedAt: data.syncedAt || '',
+          warning: payload.warning || ''
+        };
         dataStore = {
           tools: normalizeTools(data.tools || []),
           workflows: normalizeWorkflows(data.workflows || []),
@@ -1133,6 +1217,7 @@
         };
         render();
       } catch (error) {
+        syncStatus.warning = '远程同步暂不可用，已使用内置静态数据';
         console.info('使用内置静态数据，远程同步暂不可用。');
       }
     }
@@ -1292,6 +1377,65 @@
       bindCards(container);
     }
 
+    function renderMaintenance() {
+      const section = document.getElementById('maintenanceSection');
+      if (!section.classList.contains('active')) return;
+      const items = allItems();
+      const lowCompleteness = items
+        .filter(item => item.completenessScore < 60)
+        .sort((a, b) => a.completenessScore - b.completenessScore)
+        .slice(0, 12);
+      const manualCount = Array.from(manualFeatured).length;
+
+      section.innerHTML =
+        '<div class="section-head"><div><h2 class="section-title">维护状态</h2>' +
+        '<p class="section-desc">用于检查同步、数据完整度和本地精选标记</p></div>' +
+        '<button class="filter-btn" id="exportData">导出当前 JSON</button></div>' +
+        '<div class="maintenance-grid">' +
+        '<div class="maintenance-item"><div class="maintenance-label">数据来源</div><div class="maintenance-value">' + escapeHTML(syncStatus.source) + '</div></div>' +
+        '<div class="maintenance-item"><div class="maintenance-label">同步时间</div><div class="maintenance-value">' + escapeHTML(syncStatus.syncedAt || '未同步') + '</div></div>' +
+        '<div class="maintenance-item"><div class="maintenance-label">记录数量</div><div class="maintenance-value">' + items.length + ' 条</div></div>' +
+        '<div class="maintenance-item"><div class="maintenance-label">人工精选</div><div class="maintenance-value">' + manualCount + ' 条</div></div>' +
+        '</div>' +
+        (syncStatus.warning ? '<p class="section-desc">同步提示：' + escapeHTML(syncStatus.warning) + '</p>' : '') +
+        '<div class="detail-label">低完整度记录</div>' +
+        '<div class="maintenance-list">' + (lowCompleteness.length ? lowCompleteness.map(item =>
+          '<div class="maintenance-record"><strong>' + escapeHTML(item.title) + '</strong>' +
+          escapeHTML(moduleMeta[item.module].title) + ' · 完整度 ' + item.completenessScore + '% · ' + escapeHTML(item.level) + '</div>'
+        ).join('') : '<div class="maintenance-record"><strong>暂无</strong>当前没有低完整度记录。</div>') + '</div>';
+
+      document.getElementById('exportData').addEventListener('click', exportCurrentData);
+    }
+
+    function exportCurrentData() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        syncStatus,
+        manualFeatured: Array.from(manualFeatured),
+        data: dataStore
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'lu-ai-toolkit-export.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('已导出当前 JSON');
+    }
+
+    function toggleManualFeatured(uid) {
+      if (manualFeatured.has(uid)) manualFeatured.delete(uid);
+      else manualFeatured.add(uid);
+      localStorage.setItem('manualFeaturedItems', JSON.stringify(Array.from(manualFeatured)));
+      refreshLevels();
+      closeModal();
+      render();
+      showToast(manualFeatured.has(uid) ? '已标记精选' : '已取消精选');
+    }
+
     function createCard(item) {
       const grad = getGradient(item.type);
       const icon = getIcon(item.type);
@@ -1349,6 +1493,7 @@
       renderFeatured();
       renderSceneNav();
       renderSceneResults();
+      renderMaintenance();
 
       if (state.scene !== 'all') {
         renderStats(getSceneItems(state.scene));
@@ -1395,6 +1540,10 @@
         '<span class="card-tag primary">' + escapeHTML(item.level) + '</span>' +
         '<span class="card-tag">完整度 ' + escapeHTML(item.completenessScore) + '%</span>' +
         '</div>';
+      const manualHtml = '<div class="detail-label">维护操作</div><div class="detail-row">' +
+        '<button class="copy-btn" onclick="toggleManualFeatured(\'' + escapeHTML(item.uid) + '\')">' +
+        (manualFeatured.has(item.uid) ? '取消人工精选' : '标记为人工精选') +
+        '</button></div>';
       const linksHtml = item.links.length ? '<div class="detail-label">链接</div><div class="detail-row">' + linkButtons(item.links) + '</div>' : '';
       const promptHtml = item.module === 'prompts'
         ? '<div class="detail-label">完整提示词</div><button class="copy-btn" onclick="copyTextFromModal()">复制提示词</button><div class="prompt-box" id="promptText">' + escapeHTML(item.description) + '</div>'
@@ -1403,7 +1552,7 @@
       document.getElementById('modalInfo').innerHTML =
         '<h2 class="modal-title">' + escapeHTML(item.title) + '</h2>' +
         '<div class="detail-row">' + tagHtml + '</div>' +
-        levelHtml + authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml;
+        levelHtml + authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml + manualHtml;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -1495,6 +1644,11 @@
     document.getElementById('clearFilters').addEventListener('click', () => {
       resetFilters(false);
       render();
+    });
+
+    document.getElementById('maintenanceToggle').addEventListener('click', () => {
+      document.getElementById('maintenanceSection').classList.toggle('active');
+      renderMaintenance();
     });
 
     document.getElementById('modal').addEventListener('click', e => {
