@@ -56,6 +56,36 @@
       font-weight: 300;
     }
 
+    .module-tabs {
+      display: inline-flex;
+      gap: 0.25rem;
+      margin-top: 1.2rem;
+      padding: 0.25rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg);
+    }
+
+    .module-tab {
+      font-family: inherit;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0.55rem 1rem;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+
+    .module-tab:hover { color: var(--accent-dark); }
+    .module-tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(196, 164, 132, 0.22);
+    }
+
     /* Search */
     .search-wrap {
       max-width: 600px;
@@ -114,6 +144,24 @@
 
     .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
     .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .control-select {
+      min-width: 148px;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .control-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(196, 164, 132, 0.12);
+    }
 
     /* Main Grid */
     main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
@@ -198,7 +246,36 @@
     .card-link:hover { color: var(--accent-dark); text-decoration: underline; }
 
     /* Empty / Stats */
-    .stats { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.85rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .stat-item {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+
+    .stat-num {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      line-height: 1;
+    }
+
+    .stat-label {
+      margin-top: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
     .empty { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
 
@@ -216,11 +293,14 @@
     .modal.active { display: flex; }
     .modal-box {
       max-width: 700px;
+      max-height: min(86vh, 760px);
       width: 100%;
       background: var(--card-bg);
       border-radius: 16px;
       overflow: hidden;
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
     .modal-close {
       position: absolute;
@@ -243,26 +323,116 @@
     }
     .modal-info { padding: 1.5rem; }
     .modal-title { font-family: 'Noto Serif SC', serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
-    .modal-desc { color: var(--text-muted); font-size: 0.9rem; }
+    .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; }
+
+    .modal-scroll { overflow: auto; }
+
+    .detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 0.8rem 0;
+    }
+
+    .detail-label {
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .detail-link,
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--accent-dark);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 0.42rem 0.8rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .detail-link:hover,
+    .copy-btn:hover {
+      border-color: var(--accent);
+      background: rgba(196, 164, 132, 0.12);
+    }
+
+    .prompt-box {
+      margin-top: 0.8rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.6rem;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(45, 42, 38, 0.88);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      z-index: 1200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      header { padding: 1.6rem 1rem 1.2rem; }
+      header h1 { font-size: 1.45rem; }
+      .module-tabs { width: 100%; overflow-x: auto; justify-content: flex-start; }
+      .module-tab { flex: 1; padding: 0.5rem 0.75rem; }
+      .filter-bar { padding: 0.8rem; justify-content: flex-start; }
+      .control-select, .filter-btn { flex: 1 1 42%; min-width: 0; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .modal { padding: 0.8rem; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>AI 工具集</h1>
-    <p>探索人工智能的无限可能</p>
+    <p id="moduleDesc">工具、工作流与提示词资产库</p>
+    <div class="module-tabs" id="moduleTabs">
+      <button class="module-tab active" data-module="tools">工具库</button>
+      <button class="module-tab" data-module="workflows">技巧工作流</button>
+      <button class="module-tab" data-module="prompts">提示词 & Skill</button>
+    </div>
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索工具名称、类型或描述...">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索名称、场景、内容...">
     </div>
   </header>
 
-  <div class="filter-bar">
-    <button class="filter-btn active" data-filter="all">全部</button>
-    <button class="filter-btn" data-filter="设计">设计</button>
-    <button class="filter-btn" data-filter="科技">科技</button>
-    <button class="filter-btn" data-filter="商业">商业</button>
-    <button class="filter-btn" data-filter="办公">办公</button>
-    <button class="filter-btn" data-filter="人文">人文</button>
+  <div class="filter-bar" id="controlBar">
+    <select class="control-select" id="typeFilter"></select>
+    <select class="control-select" id="tagFilter"></select>
+    <select class="control-select" id="ratingFilter"></select>
+    <select class="control-select" id="sortSelect"></select>
+    <button class="filter-btn" id="clearFilters">清空筛选</button>
   </div>
 
   <main>
@@ -277,13 +447,13 @@
   <div class="modal" id="modal">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal()">×</button>
-      <img class="modal-img" id="modalImg" src="" alt="">
-      <div class="modal-info">
-        <h2 class="modal-title" id="modalTitle"></h2>
-        <p class="modal-desc" id="modalDesc"></p>
+      <div id="modalHero"></div>
+      <div class="modal-scroll">
+        <div class="modal-info" id="modalInfo"></div>
       </div>
     </div>
   </div>
+  <div class="toast" id="toast">已复制</div>
 
   <script>
     const allVideos = [
@@ -372,8 +542,190 @@
       {"id":83,"name":"ai咨询","type":"科技","category":"AI每日信息","description":"每天最重要的三条信息","url":"https://ai-digest.liziran.com/zh/","imageToken":"OOXfbJJHPoYOWVx5JA2cPFvOnid","rating":4,"updateTime":"2026-04-03"}
     ];
 
-    let currentFilter = 'all';
-    let searchQuery = '';
+    const rawWorkflows = [
+      {
+        id: 1,
+        title: '谷歌登录设计',
+        date: '2026-05-01',
+        content: '软件前端实名认证方案：Google 负责确认真人，Supabase 发证，Cloudflare Worker 检验通行证。',
+        links: ['https://mp.weixin.qq.com/s/kOh6enJArMlALqlrvxqHDQ'],
+        software: ['Supabase', 'Google Cloud'],
+        scenarios: ['实名登记']
+      },
+      {
+        id: 2,
+        title: 'git 存档',
+        date: '2026-05-01',
+        content: '版本本地保存。常用流程：git commit 存档，git log 看历史，git checkout 版本号回到旧版本，git checkout master 回到最新版。',
+        links: ['https://mp.weixin.qq.com/s/FYyOyeoHrYd_z0CLvH4fLw'],
+        software: ['Git'],
+        scenarios: ['存档', '读档', '本地保存']
+      },
+      {
+        id: 3,
+        title: '谷歌浏览器自动化脚本',
+        date: '2026-05-02',
+        content: '让 Claude Code 操控 Chrome 搜索资料并整理关键信息。可通过 Chrome DevTools MCP 实现浏览器自动化，并扩展为全自动或有限制版本。',
+        links: ['https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/README.md', 'https://github.com/davidchen99/claude-chrome-automation-windows', 'https://mp.weixin.qq.com/s/Gup_LcRA-8TlurMG5VL7Qw'],
+        software: ['Google', 'Claude Code'],
+        scenarios: ['自动化', '浏览器']
+      },
+      {
+        id: 4,
+        title: '基于今天热点写公众号并推草稿箱',
+        date: '2026-05-08',
+        content: 'aihot skill 抓今天热点 -> 选题 -> 写 1500 字左右公众号 -> 生成 2 张图 -> 后处理 -> 推送公众号草稿箱。',
+        links: [],
+        software: ['Codex', '公众号'],
+        scenarios: ['自动写作工作流']
+      },
+      {
+        id: 5,
+        title: '/neat 结尾收束整理',
+        date: '2026-05-21',
+        content: 'neat-freak 是收尾整理技能：阶段完成后，把有价值的结论、规则、文档和交接信息同步到 README、AGENTS、docs 等项目文件里，方便下次继续。',
+        links: ['https://github.com/KKKKhazix/khazix-skills/blob/main/README.md'],
+        software: ['Claude', 'Claude Code'],
+        scenarios: ['信息交接']
+      }
+    ];
+
+    const rawPrompts = [
+      {
+        id: 1,
+        author: '穿着短裤到处跑',
+        title: '图片变电商网图',
+        prompt: '第一步：打开输入到 ChatGPT Image。第二步：给这个设计一个信息丰富的电商详情页。第三步：提示词为“帮我做一张完整视觉图片，类似天猫详情页图片”。',
+        types: ['电商'],
+        rating: 4,
+        status: ''
+      },
+      {
+        id: 2,
+        author: '小冰',
+        title: '三体科幻画卷',
+        prompt: '帮我创作一幅科幻画卷，科幻风格。把《三体》系列小说用科幻画卷的形式展开。对情节和事件用适合的艺术形式、内容、媒介和文字形式进行表达和诠释，按照小说里时间的顺序进行呈现。',
+        types: ['拼贴风'],
+        rating: 0,
+        status: ''
+      },
+      {
+        id: 3,
+        author: '小冰',
+        title: '新中国时间轴拼贴画卷',
+        prompt: '做一个拼贴艺术画卷。从新中国建立开始，十年一阶段作为时间轴，生成普通中国人经典场景，比如团圆饭聚餐、中小学毕业典礼、入职求职、春节氛围、元宵灯会、中秋赏月、集市交易等画面。每个年代用对应年代标志性的照相与影像形式，带上相应时间水印。',
+        types: ['拼贴风'],
+        rating: 3,
+        status: ''
+      },
+      {
+        id: 4,
+        author: '小冰',
+        title: '历史画卷',
+        prompt: '把《毛泽东选集》做成一个历史画卷，就一句话。',
+        types: ['拼贴风'],
+        rating: 3,
+        status: ''
+      },
+      {
+        id: 5,
+        author: '',
+        title: '高校特色拼贴照',
+        prompt: '根据我的人物肖像自动生成一张收藏版史诗叙事海报。毕业照：巨大的我的侧脸剪影作为外轮廓，剪影内部自动生长出最契合该主题的完整世界观、标志性场景、角色关系、象征符号、关键建筑、生物、道具与氛围。整体不是普通拼贴，而是高级的剪影轮廓填充式叙事合成，带有双重曝光式联想，但更偏电影海报与梦幻水彩插画融合风格；柔和空气透视，轻雾化过渡，纸张颗粒，边缘飞白与刷痕，大面积留白，版式克制高级，安静、宏大、神圣、怀旧、诗意、传说感。风格、色彩、场景、材质全部根据主题自动适配，所有元素必须强绑定主题，一眼识别，不要杂乱，不要硬拼贴，不要模板化背景，不要廉价奇幻素材。如果有字体用英文。我的学校是：',
+        types: ['拼贴风'],
+        rating: 3,
+        status: ''
+      },
+      {
+        id: 6,
+        author: '参考林少',
+        date: '2026-06-07',
+        title: 'academic research skills',
+        prompt: 'academic research skills',
+        types: ['论文', '寻找文献'],
+        rating: 0,
+        status: '未使用'
+      }
+    ];
+
+    const moduleMeta = {
+      tools: {
+        title: '工具库',
+        desc: '按场景查找可访问、可学习、可复用的 AI 工具',
+        typeLabel: '全部类型',
+        tagLabel: '全部场景',
+        empty: '未找到匹配的工具'
+      },
+      workflows: {
+        title: '技巧工作流',
+        desc: '沉淀教程、自动化流程和实践经验',
+        typeLabel: '全部软件',
+        tagLabel: '全部场景',
+        empty: '未找到匹配的工作流'
+      },
+      prompts: {
+        title: '提示词 & Skill',
+        desc: '可复制使用的提示词、skill 和创作模板',
+        typeLabel: '全部类型',
+        tagLabel: '全部状态',
+        empty: '未找到匹配的提示词'
+      }
+    };
+
+    const state = {
+      module: 'tools',
+      query: '',
+      type: 'all',
+      tag: 'all',
+      rating: 'all',
+      sort: 'default'
+    };
+
+    let currentItems = [];
+
+    function escapeHTML(value) {
+      return String(value || '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
+    function cleanText(value) {
+      return String(value || '').trim();
+    }
+
+    function stripMarkdownLink(value) {
+      return cleanText(value).replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+    }
+
+    function normalizeName(value) {
+      const text = stripMarkdownLink(value);
+      const fixes = {
+        'cloud flare': 'Cloudflare',
+        'github': 'GitHub',
+        'claud code': 'Claude Code',
+        'olama': 'ollama',
+        'superbase': 'Supabase'
+      };
+      const key = text.toLowerCase();
+      return fixes[key] || text;
+    }
+
+    function normalizeUrl(url) {
+      return cleanText(url).replace(/[);，。]+$/g, '');
+    }
+
+    function normalizeDate(value) {
+      const text = cleanText(value);
+      return text ? text.slice(0, 10) : '';
+    }
+
+    function compactList(list) {
+      return Array.from(new Set((list || []).map(cleanText).filter(Boolean)));
+    }
 
     function getGradient(type) {
       const gradients = {
@@ -381,88 +733,251 @@
         '科技': 'linear-gradient(135deg, #D4DEE8 0%, #7BA3C4 100%)',
         '商业': 'linear-gradient(135deg, #E8E4D4 0%, #C4B484 100%)',
         '办公': 'linear-gradient(135deg, #D4E8D8 0%, #7BC49B 100%)',
-        '人文': 'linear-gradient(135deg, #E8D4D4 0%, #C48484 100%)'
+        '人文': 'linear-gradient(135deg, #E8D4D4 0%, #C48484 100%)',
+        '工作流': 'linear-gradient(135deg, #DCD8C8 0%, #A9A58F 100%)',
+        '提示词': 'linear-gradient(135deg, #E6D8DD 0%, #B995A4 100%)'
       };
       return gradients[type] || 'linear-gradient(135deg, #E8E3DC 0%, #C4C4C4 100%)';
     }
 
     function getIcon(type) {
       const icons = {
-        '设计': '🎨', '科技': '⚡', '商业': '💼', '办公': '📊', '人文': '📚'
+        '设计': '艺', '科技': 'AI', '商业': '商', '办公': '办', '人文': '文',
+        '工作流': '流', '提示词': '词'
       };
-      return icons[type] || '🔧';
+      return icons[type] || 'AI';
     }
 
     function getStars(rating) {
-      const n = rating || 0;
-      return '★'.repeat(n) + '☆'.repeat(5 - n);
+      const n = Math.max(0, Math.min(5, Number(rating) || 0));
+      return n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '未评分';
     }
 
-    function createCard(video) {
-      const grad = getGradient(video.type);
-      const icon = getIcon(video.type);
-      const initials = video.name.slice(0, 2).toUpperCase();
+    function buildLink(url, label) {
+      const cleanUrl = normalizeUrl(url);
+      if (!cleanUrl) return '';
+      const safeUrl = escapeHTML(cleanUrl);
+      return '<a class="detail-link" href="' + safeUrl + '" target="_blank" rel="noopener">' + escapeHTML(label || '打开链接') + '</a>';
+    }
 
-      return '<div class="card" onclick="openModal(' + video.id + ')">' +
+    function linkButtons(links) {
+      return compactList(links).map((url, index) => buildLink(url, index === 0 ? '访问' : '参考 ' + (index + 1))).join('');
+    }
+
+    function normalizeTools() {
+      return allVideos
+        .filter(item => cleanText(item.name) || cleanText(item.description))
+        .map(item => {
+          const type = cleanText(item.type) || '未分类';
+          const category = cleanText(item.category);
+          const title = normalizeName(item.name || category || '未命名工具');
+          const description = cleanText(item.description);
+          return {
+            uid: 'tools-' + item.id,
+            module: 'tools',
+            title,
+            description,
+            type,
+            tags: compactList([category]),
+            filterGroups: compactList([type]),
+            filterTags: compactList([category]),
+            rating: Number(item.rating) || 0,
+            date: normalizeDate(item.updateTime),
+            status: '',
+            links: compactList([item.url]),
+            searchText: [title, description, type, category].join(' ').toLowerCase()
+          };
+        });
+    }
+
+    function normalizeWorkflows() {
+      return rawWorkflows.map(item => ({
+        uid: 'workflows-' + item.id,
+        module: 'workflows',
+        title: cleanText(item.title),
+        description: cleanText(item.content),
+        type: '工作流',
+        tags: compactList([...(item.software || []), ...(item.scenarios || [])]),
+        filterGroups: compactList(item.software),
+        filterTags: compactList(item.scenarios),
+        rating: 0,
+        date: normalizeDate(item.date),
+        status: '',
+        links: compactList(item.links),
+        searchText: [item.title, item.content, ...(item.software || []), ...(item.scenarios || [])].join(' ').toLowerCase()
+      }));
+    }
+
+    function normalizePrompts() {
+      return rawPrompts.map(item => ({
+        uid: 'prompts-' + item.id,
+        module: 'prompts',
+        title: cleanText(item.title || item.prompt).slice(0, 80),
+        description: cleanText(item.prompt),
+        type: '提示词',
+        tags: compactList([...(item.types || []), item.status]),
+        filterGroups: compactList(item.types),
+        filterTags: compactList([item.status || '未标记']),
+        rating: Number(item.rating) || 0,
+        date: normalizeDate(item.date),
+        status: cleanText(item.status),
+        author: cleanText(item.author),
+        links: [],
+        searchText: [item.title, item.prompt, item.author, ...(item.types || []), item.status].join(' ').toLowerCase()
+      }));
+    }
+
+    const dataStore = {
+      tools: normalizeTools(),
+      workflows: normalizeWorkflows(),
+      prompts: normalizePrompts()
+    };
+
+    function getAllCurrentOptions(field) {
+      return Array.from(new Set(dataStore[state.module].flatMap(item => item[field] || []))).filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    }
+
+    function setSelectOptions(select, label, options, value) {
+      select.innerHTML = '<option value="all">' + escapeHTML(label) + '</option>' +
+        options.map(option => '<option value="' + escapeHTML(option) + '">' + escapeHTML(option) + '</option>').join('');
+      select.value = options.includes(value) ? value : 'all';
+    }
+
+    function renderControls() {
+      const meta = moduleMeta[state.module];
+      setSelectOptions(document.getElementById('typeFilter'), meta.typeLabel, getAllCurrentOptions('filterGroups'), state.type);
+      setSelectOptions(document.getElementById('tagFilter'), meta.tagLabel, getAllCurrentOptions('filterTags'), state.tag);
+
+      const ratingSelect = document.getElementById('ratingFilter');
+      ratingSelect.innerHTML = '<option value="all">全部评分</option><option value="5">5 星</option><option value="4">4 星以上</option><option value="3">3 星以上</option><option value="unrated">未评分</option>';
+      ratingSelect.value = state.rating;
+
+      const sortSelect = document.getElementById('sortSelect');
+      sortSelect.innerHTML = '<option value="default">默认排序</option><option value="rating">评分最高</option><option value="latest">最新更新</option><option value="name">名称排序</option>';
+      sortSelect.value = state.sort;
+    }
+
+    function getFilteredItems() {
+      let items = [...dataStore[state.module]];
+      if (state.type !== 'all') items = items.filter(item => item.filterGroups.includes(state.type));
+      if (state.tag !== 'all') items = items.filter(item => item.filterTags.includes(state.tag));
+      if (state.rating !== 'all') {
+        if (state.rating === 'unrated') items = items.filter(item => !item.rating);
+        else items = items.filter(item => item.rating >= Number(state.rating));
+      }
+      if (state.query) {
+        const q = state.query.toLowerCase();
+        items = items.filter(item => item.searchText.includes(q));
+      }
+
+      items.sort((a, b) => {
+        if (state.sort === 'rating') return (b.rating || 0) - (a.rating || 0) || (b.date || '').localeCompare(a.date || '');
+        if (state.sort === 'latest') return (b.date || '').localeCompare(a.date || '') || (b.rating || 0) - (a.rating || 0);
+        if (state.sort === 'name') return a.title.localeCompare(b.title, 'zh-CN');
+        if (state.module === 'workflows') return (b.date || '').localeCompare(a.date || '');
+        return (b.rating || 0) - (a.rating || 0) || (b.date || '').localeCompare(a.date || '');
+      });
+      return items;
+    }
+
+    function renderStats(items) {
+      const allTools = dataStore.tools.length;
+      const allWorkflows = dataStore.workflows.length;
+      const allPrompts = dataStore.prompts.length;
+      const highRating = dataStore.tools.filter(item => item.rating >= 4).length;
+      document.getElementById('stats').innerHTML =
+        '<div class="stat-item"><div class="stat-num">' + allTools + '</div><div class="stat-label">工具</div></div>' +
+        '<div class="stat-item"><div class="stat-num">' + highRating + '</div><div class="stat-label">高评分工具</div></div>' +
+        '<div class="stat-item"><div class="stat-num">' + allWorkflows + '</div><div class="stat-label">工作流</div></div>' +
+        '<div class="stat-item"><div class="stat-num">' + items.length + '/' + (state.module === 'tools' ? allTools : state.module === 'workflows' ? allWorkflows : allPrompts) + '</div><div class="stat-label">当前结果</div></div>';
+    }
+
+    function createCard(item) {
+      const grad = getGradient(item.type);
+      const icon = getIcon(item.type);
+      const tags = item.tags.slice(0, 4).map((tag, index) =>
+        '<span class="card-tag' + (index === 0 ? ' primary' : '') + '">' + escapeHTML(tag) + '</span>'
+      ).join('');
+      const date = item.date ? '<span>' + escapeHTML(item.date) + '</span>' : '<span></span>';
+      const link = item.links.length ? '<a href="' + escapeHTML(normalizeUrl(item.links[0])) + '" target="_blank" rel="noopener" class="card-link" onclick="event.stopPropagation()">访问 →</a>' : '';
+      const copy = item.module === 'prompts'
+        ? '<button class="card-link copy-card" data-copy="' + escapeHTML(item.description) + '" onclick="event.stopPropagation()">复制</button>'
+        : link;
+
+      return '<div class="card" data-uid="' + escapeHTML(item.uid) + '">' +
         '<div class="card-img" style="background:' + grad + ';display:flex;align-items:center;justify-content:center;">' +
-        '<span style="font-size:2.5rem;color:rgba(255,255,255,0.9);">' + icon + '</span></div>' +
+        '<span style="font-family:\'Noto Serif SC\',serif;font-size:2rem;font-weight:700;color:rgba(255,255,255,0.92);letter-spacing:0;">' + escapeHTML(icon) + '</span></div>' +
         '<div class="card-body">' +
-        '<h3 class="card-title">' + video.name + '</h3>' +
-        '<div class="card-tags">' +
-        (video.type ? '<span class="card-tag primary">' + video.type + '</span>' : '') +
-        (video.category ? '<span class="card-tag">' + video.category + '</span>' : '') +
-        '</div>' +
-        (video.description ? '<p class="card-desc">' + video.description + '</p>' : '') +
+        '<h3 class="card-title">' + escapeHTML(item.title) + '</h3>' +
+        '<div class="card-tags">' + tags + '</div>' +
+        (item.description ? '<p class="card-desc">' + escapeHTML(item.description) + '</p>' : '') +
         '<div class="card-footer">' +
-        '<span class="card-stars">' + getStars(video.rating) + '</span>' +
-        (video.url ? '<a href="' + video.url + '" target="_blank" class="card-link" onclick="event.stopPropagation()">访问 →</a>' : '') +
+        '<span class="card-stars">' + (item.module === 'workflows' ? date : escapeHTML(getStars(item.rating))) + '</span>' +
+        copy +
         '</div></div></div>';
     }
 
     function render() {
       const grid = document.getElementById('grid');
       const empty = document.getElementById('empty');
-      const stats = document.getElementById('stats');
+      const meta = moduleMeta[state.module];
+      document.getElementById('moduleDesc').textContent = meta.desc;
+      document.getElementById('searchInput').placeholder = state.module === 'tools'
+        ? '搜索工具名称、类型或使用场景...'
+        : state.module === 'workflows'
+          ? '搜索工作流、软件或场景...'
+          : '搜索提示词、作者或类型...';
 
-      let filtered = allVideos;
+      renderControls();
+      currentItems = getFilteredItems();
+      renderStats(currentItems);
 
-      if (currentFilter !== 'all') {
-        filtered = filtered.filter(v => v.type === currentFilter);
-      }
-
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(v =>
-          v.name.toLowerCase().includes(q) ||
-          (v.type && v.type.toLowerCase().includes(q)) ||
-          (v.category && v.category.toLowerCase().includes(q)) ||
-          (v.description && v.description.toLowerCase().includes(q))
-        );
-      }
-
-      if (filtered.length === 0) {
+      if (!currentItems.length) {
         grid.innerHTML = '';
         empty.style.display = 'block';
-        stats.textContent = '';
+        empty.querySelector('p').textContent = meta.empty;
         return;
       }
 
       empty.style.display = 'none';
-      stats.textContent = currentFilter === 'all' && !searchQuery
-        ? '共 ' + filtered.length + ' 个工具'
-        : '筛选结果：' + filtered.length + ' 个工具';
-      grid.innerHTML = filtered.map(createCard).join('');
+      grid.innerHTML = currentItems.map(createCard).join('');
+      grid.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => openModal(card.dataset.uid));
+      });
+      grid.querySelectorAll('.copy-card').forEach(btn => {
+        btn.addEventListener('click', event => {
+          event.stopPropagation();
+          copyText(btn.dataset.copy);
+        });
+      });
     }
 
-    function openModal(id) {
-      const v = allVideos.find(x => x.id === id);
-      if (!v) return;
+    function findItem(uid) {
+      return Object.values(dataStore).flat().find(item => item.uid === uid);
+    }
 
+    function openModal(uid) {
+      const item = findItem(uid);
+      if (!item) return;
       const modal = document.getElementById('modal');
-      document.getElementById('modalImg').style.cssText = 'width:100%;aspect-ratio:16/9;object-fit:cover;background:' + getGradient(v.type) + ';display:flex;align-items:center;justify-content:center;';
-      document.getElementById('modalImg').outerHTML = '<div style="width:100%;aspect-ratio:16/9;background:' + getGradient(v.type) + ';display:flex;align-items:center;justify-content:center;"><span style="font-size:4rem;color:rgba(255,255,255,0.9);">' + getIcon(v.type) + '</span></div>';
-      document.getElementById('modalTitle').textContent = v.name;
-      document.getElementById('modalDesc').textContent = v.description || '';
+      document.getElementById('modalHero').innerHTML =
+        '<div style="width:100%;aspect-ratio:16/8;background:' + getGradient(item.type) + ';display:flex;align-items:center;justify-content:center;">' +
+        '<span style="font-family:\'Noto Serif SC\',serif;font-size:3.6rem;font-weight:700;color:rgba(255,255,255,0.9);">' + escapeHTML(getIcon(item.type)) + '</span></div>';
+
+      const tagHtml = item.tags.map(tag => '<span class="card-tag">' + escapeHTML(tag) + '</span>').join('');
+      const dateHtml = item.date ? '<div class="detail-label">时间</div><div class="modal-desc">' + escapeHTML(item.date) + '</div>' : '';
+      const authorHtml = item.author ? '<div class="detail-label">作者</div><div class="modal-desc">' + escapeHTML(item.author) + '</div>' : '';
+      const ratingHtml = item.module !== 'workflows' ? '<div class="detail-label">评分</div><div class="modal-desc">' + escapeHTML(getStars(item.rating)) + '</div>' : '';
+      const statusHtml = item.status ? '<div class="detail-label">使用状态</div><div class="modal-desc">' + escapeHTML(item.status) + '</div>' : '';
+      const linksHtml = item.links.length ? '<div class="detail-label">链接</div><div class="detail-row">' + linkButtons(item.links) + '</div>' : '';
+      const promptHtml = item.module === 'prompts'
+        ? '<div class="detail-label">完整提示词</div><button class="copy-btn" onclick="copyTextFromModal()">复制提示词</button><div class="prompt-box" id="promptText">' + escapeHTML(item.description) + '</div>'
+        : '<div class="detail-label">内容</div><p class="modal-desc">' + escapeHTML(item.description) + '</p>';
+
+      document.getElementById('modalInfo').innerHTML =
+        '<h2 class="modal-title">' + escapeHTML(item.title) + '</h2>' +
+        '<div class="detail-row">' + tagHtml + '</div>' +
+        authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -472,18 +987,86 @@
       document.body.style.overflow = '';
     }
 
-    // Event listeners
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function copyText(text) {
+      const value = cleanText(text);
+      if (!value) return;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value).then(() => showToast('已复制提示词'));
+        return;
+      }
+      const input = document.createElement('textarea');
+      input.value = value;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.focus();
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      showToast('已复制提示词');
+    }
+
+    function copyTextFromModal() {
+      const el = document.getElementById('promptText');
+      if (el) copyText(el.textContent);
+    }
+
+    function resetFilters(keepQuery) {
+      state.type = 'all';
+      state.tag = 'all';
+      state.rating = 'all';
+      state.sort = 'default';
+      if (!keepQuery) {
+        state.query = '';
+        document.getElementById('searchInput').value = '';
+      }
+    }
+
+    document.querySelectorAll('.module-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.module-tab').forEach(item => item.classList.remove('active'));
+        tab.classList.add('active');
+        state.module = tab.dataset.module;
+        resetFilters(true);
         render();
       });
     });
 
     document.getElementById('searchInput').addEventListener('input', e => {
-      searchQuery = e.target.value.trim();
+      state.query = e.target.value.trim();
+      render();
+    });
+
+    document.getElementById('typeFilter').addEventListener('change', e => {
+      state.type = e.target.value;
+      render();
+    });
+
+    document.getElementById('tagFilter').addEventListener('change', e => {
+      state.tag = e.target.value;
+      render();
+    });
+
+    document.getElementById('ratingFilter').addEventListener('change', e => {
+      state.rating = e.target.value;
+      render();
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', e => {
+      state.sort = e.target.value;
+      render();
+    });
+
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      resetFilters(false);
       render();
     });
 
