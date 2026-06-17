@@ -1,0 +1,19 @@
+name = "lu-ai-toolkit-sync"
+main = "worker/index.js"
+compatibility_date = "2026-05-01"
+
+# Required Worker secrets:
+# wrangler secret put FEISHU_APP_ID
+# wrangler secret put FEISHU_APP_SECRET
+#
+# Optional variables:
+# FEISHU_WIKI_URL  = "https://my.feishu.cn/wiki/..."
+# FEISHU_BASE_TOKEN = "GrdVbbTulahSONsH3zOccNLqn0f"
+# TOOL_TABLE_ID = "tblfxy4bf1GZjkOj"
+# WORKFLOW_TABLE_ID = "tblTQTdBYZi6oknL"
+# PROMPT_TABLE_ID = "tblAcyG2FFqtPPgj"
+
+# Optional KV cache binding. If omitted, the Worker falls back to Cache API.
+# [[kv_namespaces]]
+# binding = "AI_TOOLKIT_CACHE"
+# id = "replace_with_cloudflare_kv_namespace_id"
