@@ -205,6 +205,27 @@
       display: block;
     }
 
+    .media-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-frame .media-fallback { display: none; }
+    .media-frame.image-failed img { display: none; }
+    .media-frame.image-failed .media-fallback { display: block; }
+
     .card-body { padding: 1rem; }
 
     .card-title {
@@ -522,6 +543,22 @@
     .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; }
 
     .modal-scroll { overflow: auto; }
+
+    .media-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.7rem;
+      margin: 0.6rem 0 1rem;
+    }
+
+    .media-gallery img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
 
     .detail-row {
       display: flex;
@@ -1005,6 +1042,13 @@
       return cleanText(url).replace(/[);，。]+$/g, '');
     }
 
+    function normalizeImageUrls(value) {
+      const values = Array.isArray(value) ? value : compactList([value]);
+      return Array.from(new Set(values
+        .map(normalizeUrl)
+        .filter(url => /^https?:\/\//i.test(url))));
+    }
+
     function normalizeDate(value) {
       const text = cleanText(value);
       return text ? text.slice(0, 10) : '';
@@ -1130,6 +1174,28 @@
       return compactList(links).map((url, index) => buildLink(url, index === 0 ? '访问' : '参考 ' + (index + 1))).join('');
     }
 
+    function mediaFrame(item, ratio, iconSize) {
+      const imageUrl = item.imageUrls && item.imageUrls[0] ? normalizeUrl(item.imageUrls[0]) : '';
+      const fallback =
+        '<span class="media-fallback" style="font-family:\'Noto Serif SC\',serif;font-size:' + iconSize + ';font-weight:700;color:rgba(255,255,255,0.92);letter-spacing:0;">' +
+        escapeHTML(getIcon(item.type)) + '</span>';
+      if (!imageUrl) {
+        return '<div class="media-frame image-failed" style="aspect-ratio:' + ratio + ';background:' + getGradient(item.type) + ';">' + fallback + '</div>';
+      }
+      return '<div class="media-frame" style="aspect-ratio:' + ratio + ';background:' + getGradient(item.type) + ';">' +
+        '<img src="' + escapeHTML(imageUrl) + '" alt="' + escapeHTML(item.title) + '" loading="lazy" onerror="this.parentElement.classList.add(\'image-failed\')">' +
+        fallback +
+        '</div>';
+    }
+
+    function mediaGallery(item) {
+      const images = normalizeImageUrls(item.imageUrls).slice(0, 8);
+      if (!images.length) return '';
+      return '<div class="detail-label">效果图</div><div class="media-gallery">' +
+        images.map(url => '<img src="' + escapeHTML(url) + '" alt="' + escapeHTML(item.title) + '" loading="lazy">').join('') +
+        '</div>';
+    }
+
     function normalizeTools(source = allVideos) {
       return source
         .filter(item => cleanText(item.name) || cleanText(item.description))
@@ -1138,6 +1204,7 @@
           const category = canonicalTag(item.category);
           const title = normalizeName(item.name || category || '未命名工具');
           const description = cleanText(item.description);
+          const imageUrls = normalizeImageUrls(item.imageUrls || item.imageUrl || item.image);
           const normalized = {
             uid: 'tools-' + item.id,
             module: 'tools',
@@ -1151,6 +1218,7 @@
             date: normalizeDate(item.updateTime),
             status: cleanText(item.usageStatus),
             links: compactList([item.url, ...(item.tutorialLinks || [])]),
+            imageUrls,
             searchText: [title, description, type, category].join(' ').toLowerCase()
           };
           normalized.completenessScore = completenessScore([title, description, type, category, normalized.links, normalized.rating, normalized.date]);
@@ -1165,6 +1233,7 @@
         const description = cleanText(item.content);
         const software = canonicalList(item.software);
         const scenarios = canonicalList(item.scenarios);
+        const imageUrls = normalizeImageUrls(item.imageUrls || item.imageUrl || item.image);
         const normalized = {
           uid: 'workflows-' + item.id,
           module: 'workflows',
@@ -1178,6 +1247,7 @@
           date: normalizeDate(item.date),
           status: '',
           links: compactList(item.links),
+          imageUrls,
           searchText: [title, description, ...software, ...scenarios].join(' ').toLowerCase()
         };
         normalized.completenessScore = completenessScore([title, normalized.date, description, software, scenarios, normalized.links]);
@@ -1192,6 +1262,7 @@
         const description = cleanText(item.prompt);
         const types = canonicalList(item.types);
         const status = cleanText(item.status);
+        const imageUrls = normalizeImageUrls(item.imageUrls || item.imageUrl || item.image);
         const normalized = {
           uid: 'prompts-' + item.id,
           module: 'prompts',
@@ -1206,6 +1277,7 @@
           status,
           author: cleanText(item.author),
           links: [],
+          imageUrls,
           searchText: [title, description, item.author, ...types, status].join(' ').toLowerCase()
         };
         normalized.completenessScore = completenessScore([title, description, types, normalized.author, normalized.rating || status]);
@@ -1479,8 +1551,6 @@
     }
 
     function createCard(item) {
-      const grad = getGradient(item.type);
-      const icon = getIcon(item.type);
       const tags = item.tags.slice(0, 4).map((tag, index) =>
         '<span class="card-tag' + (index === 0 ? ' primary' : '') + '">' + escapeHTML(tag) + '</span>'
       ).join('');
@@ -1492,8 +1562,7 @@
 
       return '<div class="card" data-uid="' + escapeHTML(item.uid) + '">' +
         '<span class="level-badge ' + levelClass(item.level) + '">' + escapeHTML(item.level) + '</span>' +
-        '<div class="card-img" style="background:' + grad + ';display:flex;align-items:center;justify-content:center;">' +
-        '<span style="font-family:\'Noto Serif SC\',serif;font-size:2rem;font-weight:700;color:rgba(255,255,255,0.92);letter-spacing:0;">' + escapeHTML(icon) + '</span></div>' +
+        mediaFrame(item, '16/10', '2rem') +
         '<div class="card-body">' +
         '<h3 class="card-title">' + escapeHTML(item.title) + '</h3>' +
         '<div class="card-tags">' + tags + '</div>' +
@@ -1569,9 +1638,7 @@
       const item = findItem(uid);
       if (!item) return;
       const modal = document.getElementById('modal');
-      document.getElementById('modalHero').innerHTML =
-        '<div style="width:100%;aspect-ratio:16/8;background:' + getGradient(item.type) + ';display:flex;align-items:center;justify-content:center;">' +
-        '<span style="font-family:\'Noto Serif SC\',serif;font-size:3.6rem;font-weight:700;color:rgba(255,255,255,0.9);">' + escapeHTML(getIcon(item.type)) + '</span></div>';
+      document.getElementById('modalHero').innerHTML = mediaFrame(item, '16/8', '3.6rem');
 
       const tagHtml = item.tags.map(tag => '<span class="card-tag">' + escapeHTML(tag) + '</span>').join('');
       const dateHtml = item.date ? '<div class="detail-label">时间</div><div class="modal-desc">' + escapeHTML(item.date) + '</div>' : '';
@@ -1587,6 +1654,7 @@
         (manualFeatured.has(item.uid) ? '取消人工精选' : '标记为人工精选') +
         '</button></div>';
       const linksHtml = item.links.length ? '<div class="detail-label">链接</div><div class="detail-row">' + linkButtons(item.links) + '</div>' : '';
+      const galleryHtml = mediaGallery(item);
       const promptHtml = item.module === 'prompts'
         ? '<div class="detail-label">完整提示词</div><button class="copy-btn" onclick="copyTextFromModal()">复制提示词</button><div class="prompt-box" id="promptText">' + escapeHTML(item.description) + '</div>'
         : '<div class="detail-label">内容</div><p class="modal-desc">' + escapeHTML(item.description) + '</p>';
@@ -1594,7 +1662,7 @@
       document.getElementById('modalInfo').innerHTML =
         '<h2 class="modal-title">' + escapeHTML(item.title) + '</h2>' +
         '<div class="detail-row">' + tagHtml + '</div>' +
-        levelHtml + authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml + manualHtml;
+        levelHtml + authorHtml + dateHtml + ratingHtml + statusHtml + galleryHtml + promptHtml + linksHtml + manualHtml;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }

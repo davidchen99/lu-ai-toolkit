@@ -51,6 +51,7 @@ https://lu-ai-toolkit.pages.dev
 - 场景聚合：做图创作、公众号写作、科研学习、AI 编程、办公提效。
 - 维护状态：同步状态、记录数、人工精选数、低完整度记录、JSON 导出。
 - API 端点：维护状态中显示当前成功使用的同步端点，未连接时显示同步提示。
+- 图片展示：工具效果图、工作流附件图、提示词效果图统一映射到 `imageUrls`，卡片和详情页优先展示首图，失败回退到原渐变占位。
 
 ## Worker API
 
@@ -81,6 +82,14 @@ Base 来源可以用以下任一方式配置：
 
 - `FEISHU_BASE_TOKEN`
 - `FEISHU_WIKI_URL`，Worker 会解析 Wiki 节点到 Base token
+
+图片字段映射：
+
+- AI 工具：`效果图片` -> `imageUrls`
+- AI 技巧总结：`附件` 或 `效果图` -> `imageUrls`
+- AI skill 和提示词：`效果` 或 `效果图` -> `imageUrls`
+
+当前版本只直接展示字段中可解析出的 `http/https` 图片 URL。若飞书附件字段只返回内部 `file_token`，还需要后续增加附件下载代理后才能公开展示。
 
 ## 缓存策略
 

@@ -100,6 +100,7 @@ Invoke-WebRequest -UseBasicParsing -Method POST https://lu-ai-toolkit-sync.army-
   "description": "内容",
   "url": "网页链接",
   "tutorialLinks": [],
+  "imageUrls": [],
   "rating": 4,
   "updateTime": "2026-06-17",
   "usageStatus": "熟悉"
@@ -115,6 +116,7 @@ Invoke-WebRequest -UseBasicParsing -Method POST https://lu-ai-toolkit-sync.army-
   "date": "2026-06-17",
   "content": "内容",
   "links": [],
+  "imageUrls": [],
   "software": [],
   "scenarios": []
 }
@@ -131,9 +133,26 @@ Invoke-WebRequest -UseBasicParsing -Method POST https://lu-ai-toolkit-sync.army-
   "prompt": "提示词",
   "types": [],
   "rating": 4,
+  "imageUrls": [],
   "status": "非常好用"
 }
 ```
+
+## 图片与附件
+
+三类资源都可以返回 `imageUrls`。前端会：
+
+- 卡片优先展示第一张图。
+- 详情页最多展示前 8 张图。
+- 图片加载失败时回退到原有渐变占位，不显示破图。
+
+Worker 当前会从以下字段解析可访问图片 URL：
+
+- AI 工具：`效果图片`
+- AI 技巧总结：`附件` 或 `效果图`
+- AI skill 和提示词：`效果` 或 `效果图`
+
+如果飞书只返回内部附件 token，`imageUrls` 可能为空。需要公开展示这类附件时，应新增 Worker 附件下载代理，避免把飞书访问 token 暴露给前端。
 
 ## 字段变更规则
 

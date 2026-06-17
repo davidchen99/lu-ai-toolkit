@@ -30,6 +30,7 @@
 - 内容分级：精选、常用、待验证、归档。
 - 内容完整度评分、低完整度清单、维护状态面板。
 - 导出当前 JSON、本地人工精选。
+- 效果图展示：卡片和详情页支持 `imageUrls`，失败自动回退占位。
 - Worker API: `/api/health`、`/api/resources`、`/api/sync`。
 - Pages 前端会先请求同域 `/api/resources`，不可用时自动兜底到生产 Worker API。
 - Worker 定时任务：每 6 小时尝试同步一次飞书数据。

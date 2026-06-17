@@ -10,7 +10,9 @@
 - 前端已实现搜索、筛选、排序、详情弹窗、提示词复制。
 - 前端已实现陆同学精选、场景导航、场景聚合、内容分级、完整度评分。
 - 前端已实现维护状态、低完整度清单、导出当前 JSON、本地人工精选。
+- 前端已实现 `imageUrls` 图片展示，卡片和详情页能展示效果图，失败回退到渐变占位。
 - Worker 已实现飞书同步接口、缓存兜底、手动同步、定时同步。
+- Worker 已映射飞书效果图片、附件和效果字段中的可访问图片 URL。
 - Cloudflare Pages 已上线：`https://lu-ai-toolkit.pages.dev`
 - Worker + Assets 已上线：`https://lu-ai-toolkit-sync.army-815.workers.dev`
 - GitHub 私有仓库已归档：`https://github.com/davidchen99/lu-ai-toolkit`
@@ -28,7 +30,7 @@
 
 - 生产环境飞书实时同步待配置 `FEISHU_APP_ID`、`FEISHU_APP_SECRET`，以及 `FEISHU_WIKI_URL` 或 `FEISHU_BASE_TOKEN`。
 - Pages 域名默认是静态站点；前端已有 Worker API 兜底，但飞书实时同步仍依赖生产密钥。
-- 飞书附件图片同步尚未作为完整生产链路验收。
+- 飞书附件图片的可访问 URL 已支持；仅返回内部 `file_token` 的附件仍需后续增加下载代理。
 - 飞书字段如果继续调整，需要同步更新 Worker 字段映射和接入文档。
 
 ## 推荐下一步

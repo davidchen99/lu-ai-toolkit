@@ -172,6 +172,7 @@ function mapToolRecord(record) {
     description,
     url: firstUrl(fields['网页链接']),
     tutorialLinks: allUrls(fields['教学链接']),
+    imageUrls: imageUrls(fields['效果图片']),
     rating: Number(fields['实用频率'] || 0),
     updateTime: asDate(fields['更新时间（保质期）']),
     usageStatus: firstText(fields['是否使用'])
@@ -189,6 +190,7 @@ function mapWorkflowRecord(record) {
     date: asDate(fields['日期']),
     content,
     links: [...allUrls(fields['工具链接']), ...allUrls(fields['参考教程'])],
+    imageUrls: imageUrls(fields['附件'] || fields['效果图']),
     software: toTextArray(fields['涉及的软件']),
     scenarios: toTextArray(fields['场景'])
   };
@@ -207,6 +209,7 @@ function mapPromptRecord(record) {
     prompt,
     types: toTextArray(fields['类型']),
     rating: Number(fields['有用/趣评分'] || 0),
+    imageUrls: imageUrls(fields['效果'] || fields['效果图']),
     status: joinText(fields['是否使用'])
   };
 }
@@ -256,6 +259,15 @@ function allUrls(value) {
 
 function firstUrl(value) {
   return allUrls(value)[0] || '';
+}
+
+function imageUrls(value) {
+  return allUrls(value).filter(isImageLikeUrl);
+}
+
+function isImageLikeUrl(url) {
+  if (!url) return false;
+  return /\.(png|jpe?g|gif|webp|avif|svg)(\?|#|$)/i.test(url) || /image|thumbnail|attachment|file/i.test(url);
 }
 
 async function readCache(env) {
