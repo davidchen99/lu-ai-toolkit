@@ -242,7 +242,16 @@
     }
 
     .card-stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 2px; }
-    .card-link { font-size: 0.75rem; color: var(--accent); text-decoration: none; }
+    .card-link {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0;
+    }
     .card-link:hover { color: var(--accent-dark); text-decoration: underline; }
 
     /* Empty / Stats */
