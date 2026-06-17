@@ -1,6 +1,6 @@
 # 交接记录
 
-日期：2026-06-17
+日期：2026-06-18
 
 ## 已完成
 
@@ -21,12 +21,13 @@
 - Worker 首页返回 `200`，标题为“陆同学AI工具集”。
 - Worker `/api/health` 返回 `{"ok":true,"service":"lu-ai-toolkit-sync"}`。
 - Worker `/api/resources` 在未配置飞书密钥时返回 `502`，错误为缺少 `FEISHU_APP_ID` 或 `FEISHU_APP_SECRET`。
+- Pages 前端已支持同域 API 失败后自动兜底到生产 Worker API。
 - Git 状态已同步到 `origin/master`。
 
 ## 未完成或待配置
 
 - 生产环境飞书实时同步待配置 `FEISHU_APP_ID`、`FEISHU_APP_SECRET`，以及 `FEISHU_WIKI_URL` 或 `FEISHU_BASE_TOKEN`。
-- Pages 域名默认是静态站点，实时同步建议使用 Worker 域名，或后续配置 Pages API 代理。
+- Pages 域名默认是静态站点；前端已有 Worker API 兜底，但飞书实时同步仍依赖生产密钥。
 - 飞书附件图片同步尚未作为完整生产链路验收。
 - 飞书字段如果继续调整，需要同步更新 Worker 字段映射和接入文档。
 

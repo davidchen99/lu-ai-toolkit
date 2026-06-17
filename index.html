@@ -955,9 +955,20 @@
     let syncStatus = {
       source: '内置静态数据',
       syncedAt: '',
-      warning: ''
+      warning: '',
+      endpoint: ''
     };
     let manualFeatured = new Set(JSON.parse(localStorage.getItem('manualFeaturedItems') || '[]'));
+
+    const REMOTE_API_ORIGIN = 'https://lu-ai-toolkit-sync.army-815.workers.dev';
+
+    function resourceEndpoints() {
+      const endpoints = ['/api/resources'];
+      if (location.origin !== REMOTE_API_ORIGIN) {
+        endpoints.push(REMOTE_API_ORIGIN + '/api/resources');
+      }
+      return endpoints;
+    }
 
     function escapeHTML(value) {
       return String(value || '').replace(/[&<>"']/g, char => ({
@@ -1210,27 +1221,46 @@
     };
 
     async function loadRemoteResources() {
+      const warnings = [];
       try {
-        const response = await fetch('/api/resources', { cache: 'no-store' });
-        if (!response.ok) return;
-        const payload = await response.json();
-        const data = payload && payload.data;
-        if (!data || !Array.isArray(data.tools)) return;
-        syncStatus = {
-          source: payload.source || data.source || '远程同步',
-          syncedAt: data.syncedAt || '',
-          warning: payload.warning || ''
-        };
-        dataStore = {
-          tools: normalizeTools(data.tools || []),
-          workflows: normalizeWorkflows(data.workflows || []),
-          prompts: normalizePrompts(data.prompts || [])
-        };
-        render();
+        for (const endpoint of resourceEndpoints()) {
+          try {
+            const response = await fetch(endpoint, { cache: 'no-store' });
+            const payload = await response.json().catch(() => null);
+            if (!response.ok) {
+              warnings.push(payload && payload.error ? payload.error : endpoint + ' 返回 ' + response.status);
+              continue;
+            }
+            const data = payload && payload.data;
+            if (!data || !Array.isArray(data.tools)) {
+              warnings.push(endpoint + ' 数据格式不可用');
+              continue;
+            }
+            syncStatus = {
+              source: payload.source || '远程同步',
+              syncedAt: data.syncedAt || '',
+              warning: payload.warning || '',
+              endpoint
+            };
+            dataStore = {
+              tools: normalizeTools(data.tools || []),
+              workflows: normalizeWorkflows(data.workflows || []),
+              prompts: normalizePrompts(data.prompts || [])
+            };
+            render();
+            return;
+          } catch (error) {
+            warnings.push(endpoint + ' 暂不可用');
+          }
+        }
       } catch (error) {
-        syncStatus.warning = '远程同步暂不可用，已使用内置静态数据';
-        console.info('使用内置静态数据，远程同步暂不可用。');
+        warnings.push('远程同步请求异常');
       }
+      syncStatus.warning = warnings.length
+        ? '远程同步暂不可用，已使用内置静态数据；' + Array.from(new Set(warnings)).join('；')
+        : '远程同步暂不可用，已使用内置静态数据';
+      console.info('使用内置静态数据，远程同步暂不可用。');
+      renderMaintenance();
     }
 
     function getAllCurrentOptions(field) {
@@ -1405,6 +1435,7 @@
         '<div class="maintenance-grid">' +
         '<div class="maintenance-item"><div class="maintenance-label">数据来源</div><div class="maintenance-value">' + escapeHTML(syncStatus.source) + '</div></div>' +
         '<div class="maintenance-item"><div class="maintenance-label">同步时间</div><div class="maintenance-value">' + escapeHTML(syncStatus.syncedAt || '未同步') + '</div></div>' +
+        '<div class="maintenance-item"><div class="maintenance-label">API 端点</div><div class="maintenance-value">' + escapeHTML(syncStatus.endpoint || '未连接') + '</div></div>' +
         '<div class="maintenance-item"><div class="maintenance-label">记录数量</div><div class="maintenance-value">' + items.length + ' 条</div></div>' +
         '<div class="maintenance-item"><div class="maintenance-label">人工精选</div><div class="maintenance-value">' + manualCount + ' 条</div></div>' +
         '</div>' +

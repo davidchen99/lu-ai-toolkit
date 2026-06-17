@@ -1,6 +1,6 @@
 # 架构说明
 
-日期：2026-06-17
+日期：2026-06-18
 
 ## 总览
 
@@ -31,6 +31,15 @@
 index.html 捕获失败 -> 保留内置静态数据 -> 页面正常展示
 ```
 
+Pages 静态域名没有同域 API 时，前端会继续请求生产 Worker API：
+
+```text
+https://lu-ai-toolkit.pages.dev
+  -> /api/resources 不可用
+  -> https://lu-ai-toolkit-sync.army-815.workers.dev/api/resources
+  -> 成功则使用远程数据，失败则保留内置静态数据
+```
+
 ## 前端模块
 
 前端在 `index.html` 中实现：
@@ -41,6 +50,7 @@ index.html 捕获失败 -> 保留内置静态数据 -> 页面正常展示
 - 陆同学精选：基于评分、完整度、使用状态和人工精选派生。
 - 场景聚合：做图创作、公众号写作、科研学习、AI 编程、办公提效。
 - 维护状态：同步状态、记录数、人工精选数、低完整度记录、JSON 导出。
+- API 端点：维护状态中显示当前成功使用的同步端点，未连接时显示同步提示。
 
 ## Worker API
 
@@ -94,4 +104,4 @@ Worker 优先使用 KV binding `AI_TOOLKIT_CACHE`。如果没有绑定 KV，则�
 - Cloudflare Pages: `https://lu-ai-toolkit.pages.dev`
 - Worker + Assets: `https://lu-ai-toolkit-sync.army-815.workers.dev`
 
-Worker + Assets 入口可以同时服务静态页面和 `/api` 路由，更适合后续做同域 API。
+Worker + Assets 入口可以同时服务静态页面和 `/api` 路由。Pages 入口通过前端兜底请求 Worker API，配置飞书密钥后也能读取远程数据。

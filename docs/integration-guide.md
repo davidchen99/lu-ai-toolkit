@@ -1,6 +1,6 @@
 # 接入指南
 
-日期：2026-06-17
+日期：2026-06-18
 
 ## 适用对象
 
@@ -81,11 +81,11 @@ Invoke-WebRequest -UseBasicParsing -Method POST https://lu-ai-toolkit-sync.army-
 
 ## 前端接入约定
 
-`index.html` 会请求相对路径 `/api/resources`。因此：
+`index.html` 会先请求相对路径 `/api/resources`，再按需兜底到生产 Worker API：
 
-- 使用 Worker + Assets 同域部署时，前端能直接读取 API。
-- 使用 Pages 单独部署时，Pages 域名没有内置 `/api/resources`，前端会回退到内置静态数据。
-- 后续如需 Pages 也实时同步，应配置 Pages Functions、反向代理或把 API 地址改为完整 Worker URL。
+- 使用 Worker + Assets 同域部署时，前端直接读取同域 API。
+- 使用 Pages 单独部署时，如果同域 `/api/resources` 不可用，前端会请求 `https://lu-ai-toolkit-sync.army-815.workers.dev/api/resources`。
+- 如果 Worker API 也不可用或未配置飞书密钥，前端保留内置静态数据，并在维护状态中显示同步提示。
 
 ## 数据模型
 

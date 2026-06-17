@@ -31,6 +31,7 @@
 - 内容完整度评分、低完整度清单、维护状态面板。
 - 导出当前 JSON、本地人工精选。
 - Worker API: `/api/health`、`/api/resources`、`/api/sync`。
+- Pages 前端会先请求同域 `/api/resources`，不可用时自动兜底到生产 Worker API。
 - Worker 定时任务：每 6 小时尝试同步一次飞书数据。
 
 ## 本地预览
@@ -68,7 +69,7 @@ npx wrangler@4.101.0 deploy --keep-vars --assets _site
 - `FEISHU_APP_SECRET`
 - `FEISHU_WIKI_URL` 或 `FEISHU_BASE_TOKEN`
 
-未配置密钥时，页面仍可使用内置静态数据展示；`/api/resources` 会返回 `502` 和缺少密钥的错误信息。
+未配置密钥时，页面仍可使用内置静态数据展示；`/api/resources` 会返回 `502` 和缺少密钥的错误信息，维护状态面板会显示同步提示。
 
 更多细节见：
 

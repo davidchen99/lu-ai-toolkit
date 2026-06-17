@@ -1,6 +1,6 @@
 # 运维手册
 
-日期：2026-06-17
+日期：2026-06-18
 
 ## 环境要求
 
@@ -127,7 +127,7 @@ Invoke-WebRequest -UseBasicParsing https://lu-ai-toolkit-sync.army-815.workers.d
 
 ### Pages 正常但实时同步无效
 
-Pages 域名是静态站点，默认没有 `/api/resources`。页面会回退到内置数据。需要实时同步时，使用 Worker 域名访问，或为 Pages 配置 API 代理。
+Pages 域名是静态站点，默认没有同域 `/api/resources`。前端会自动兜底请求生产 Worker API。若维护状态仍显示远程同步不可用，优先检查 Worker `/api/health` 和飞书密钥配置。
 
 ### Wrangler 返回非零但显示 Deployment complete
 
