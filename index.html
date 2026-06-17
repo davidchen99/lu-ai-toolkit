@@ -186,6 +186,7 @@
       transition: transform 0.3s, box-shadow 0.3s;
       display: inline-block;
       width: 100%;
+      position: relative;
     }
 
     .card:hover {
@@ -222,6 +223,24 @@
 
     .card-tag.primary { background: var(--accent); color: #fff; }
 
+    .level-badge {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      z-index: 2;
+      border-radius: 999px;
+      padding: 0.22rem 0.55rem;
+      background: rgba(255,255,255,0.86);
+      color: var(--accent-dark);
+      font-size: 0.68rem;
+      box-shadow: 0 2px 10px rgba(45, 42, 38, 0.1);
+    }
+
+    .level-featured { background: rgba(196, 164, 132, 0.92); color: #fff; }
+    .level-common { background: rgba(212, 232, 216, 0.92); color: #4f8063; }
+    .level-pending { background: rgba(232, 228, 212, 0.94); color: #8a7a4f; }
+    .level-archived { background: rgba(232, 212, 212, 0.94); color: #946161; }
+
     .card-desc {
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -253,6 +272,107 @@
       padding: 0;
     }
     .card-link:hover { color: var(--accent-dark); text-decoration: underline; }
+
+    .section {
+      margin-bottom: 1.8rem;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.18rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+
+    .featured-grid,
+    .scene-nav,
+    .scene-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .featured-grid .card,
+    .scene-grid .card {
+      margin-bottom: 0;
+    }
+
+    .scene-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px var(--shadow);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      padding: 1rem;
+      text-align: left;
+      transition: all 0.25s;
+      min-height: 116px;
+    }
+
+    .scene-card:hover,
+    .scene-card.active {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(45, 42, 38, 0.1);
+    }
+
+    .scene-card.active {
+      background: rgba(196, 164, 132, 0.12);
+    }
+
+    .scene-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .scene-desc {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .scene-results {
+      display: none;
+    }
+
+    .scene-results.active {
+      display: block;
+    }
+
+    .scene-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 2px 12px var(--shadow);
+      padding: 1rem 1.2rem;
+    }
+
+    .scene-reset {
+      flex-shrink: 0;
+    }
 
     /* Empty / Stats */
     .stats {
@@ -417,6 +537,9 @@
       .filter-bar { padding: 0.8rem; justify-content: flex-start; }
       .control-select, .filter-btn { flex: 1 1 42%; min-width: 0; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .featured-grid, .scene-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .scene-nav { grid-template-columns: 1fr; }
+      .section-head, .scene-banner { align-items: flex-start; flex-direction: column; }
       .modal { padding: 0.8rem; }
     }
   </style>
@@ -446,11 +569,38 @@
 
   <main>
     <div class="stats" id="stats"></div>
-    <div class="masonry" id="grid"></div>
-    <div class="empty" id="empty" style="display:none;">
-      <div class="empty-icon">🔍</div>
-      <p>未找到匹配的工具</p>
-    </div>
+    <section class="section" id="featuredSection">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">陆同学精选</h2>
+          <p class="section-desc">优先展示评分高、信息完整、场景明确的内容</p>
+        </div>
+      </div>
+      <div class="featured-grid" id="featuredGrid"></div>
+    </section>
+    <section class="section" id="sceneSection">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">按场景开始</h2>
+          <p class="section-desc">从任务出发聚合工具、工作流和提示词</p>
+        </div>
+      </div>
+      <div class="scene-nav" id="sceneNav"></div>
+    </section>
+    <section class="section scene-results" id="sceneResults"></section>
+    <section class="section" id="listSection">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title" id="listTitle">工具库</h2>
+          <p class="section-desc" id="listMeta">全部工具</p>
+        </div>
+      </div>
+      <div class="masonry" id="grid"></div>
+      <div class="empty" id="empty" style="display:none;">
+        <div class="empty-icon">🔍</div>
+        <p>未找到匹配的工具</p>
+      </div>
+    </section>
   </main>
 
   <div class="modal" id="modal">
@@ -681,13 +831,47 @@
       }
     };
 
+    const sceneDefs = [
+      {
+        id: 'image',
+        title: '做图创作',
+        desc: '文生图、图生图、电商图、故事板与视觉表达',
+        keywords: ['文生图', '图生图', '拼贴风', '电商', '故事板', 'AI合图', 'P图', '三维建模', '图生三维模型', '数字人', '文生视频', '设计']
+      },
+      {
+        id: 'content',
+        title: '公众号写作',
+        desc: '热点选题、写作流程、配图和内容发布',
+        keywords: ['公众号', 'AI每日信息', '写作', '自动写作工作流', '短视频', '内容简化', '文生网站', '自媒体']
+      },
+      {
+        id: 'research',
+        title: '科研学习',
+        desc: '论文、文献、知识库、OCR、翻译与学习框架',
+        keywords: ['论文', '寻找文献', '科研流程图', '个人知识库', 'PDF', 'OCR', '翻译', '学习', '知识库', '文生PPT', 'AI快速学知识']
+      },
+      {
+        id: 'coding',
+        title: 'AI 编程',
+        desc: 'AI 编程、MCP、浏览器自动化、部署和开发工具',
+        keywords: ['AI编程', '文生程序', 'MCP', '浏览器', '自动化', 'Git', 'Cloudflare', 'Claude Code', 'Codex', '开发平台', '工作流', 'GitHub']
+      },
+      {
+        id: 'office',
+        title: '办公提效',
+        desc: '会议、PPT、OCR、信息整理、录音和思维导图',
+        keywords: ['会议', '会议转文字', '文生PPT', 'OCR', '信息整理', '思维导图', '办公', '录音', '文生思维脑图']
+      }
+    ];
+
     const state = {
       module: 'tools',
       query: '',
       type: 'all',
       tag: 'all',
       rating: 'all',
-      sort: 'default'
+      sort: 'default',
+      scene: 'all'
     };
 
     let currentItems = [];
@@ -736,6 +920,78 @@
       return Array.from(new Set((list || []).map(cleanText).filter(Boolean)));
     }
 
+    function normalizeForMatch(value) {
+      return cleanText(value).toLowerCase().replace(/\s+/g, '').replace(/[&/｜|_-]/g, '');
+    }
+
+    function canonicalTag(value) {
+      const text = cleanText(value);
+      const key = normalizeForMatch(text);
+      const aliases = {
+        'ai编程': 'AI 编程',
+        'a编程': 'AI 编程',
+        '文生程序': 'AI 编程',
+        'agent': '智能体',
+        'aiagent': '智能体',
+        '文生信息化': '信息可视化',
+        '信息可视化表达': '信息可视化',
+        '文生ppt': '文生 PPT',
+        '文本翻译': '翻译',
+        '语言翻译': '翻译',
+        'ai快速学知识': '学习与知识库',
+        '个人知识库': '学习与知识库',
+        '大语言模型的平台': '大语言模型平台',
+        'mcp服务': 'MCP',
+        'github': 'GitHub',
+        '云服务器': '云部署'
+      };
+      return aliases[key] || text;
+    }
+
+    function canonicalList(list) {
+      return compactList((list || []).map(canonicalTag));
+    }
+
+    function dateAgeDays(dateText) {
+      const date = new Date(normalizeDate(dateText) + 'T00:00:00+08:00');
+      if (Number.isNaN(date.getTime())) return 0;
+      const today = new Date('2026-06-17T00:00:00+08:00');
+      return Math.floor((today - date) / 86400000);
+    }
+
+    function completenessScore(values) {
+      const checks = values.map(value => {
+        if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === 'number') return value > 0;
+        return Boolean(cleanText(value));
+      });
+      return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    }
+
+    function classifyLevel(item) {
+      if (item.date && dateAgeDays(item.date) > 365) return '归档';
+      if (item.status && /未使用|尝试未成功/.test(item.status)) return '待验证';
+      if (!item.rating && item.module !== 'workflows') return '待验证';
+      if (item.completenessScore >= 72 && item.rating >= 4) return '精选';
+      if (item.module === 'workflows' && item.completenessScore >= 72) return '常用';
+      if (item.completenessScore >= 58 && item.rating >= 3) return '常用';
+      return '待验证';
+    }
+
+    function levelClass(level) {
+      return {
+        '精选': 'level-featured',
+        '常用': 'level-common',
+        '待验证': 'level-pending',
+        '归档': 'level-archived'
+      }[level] || '';
+    }
+
+    function rankScore(item) {
+      const levelWeight = { '精选': 400, '常用': 250, '待验证': 80, '归档': 10 }[item.level] || 0;
+      return levelWeight + (item.rating || 0) * 25 + item.completenessScore;
+    }
+
     function getGradient(type) {
       const gradients = {
         '设计': 'linear-gradient(135deg, #E8D5C4 0%, #C4A484 100%)',
@@ -778,62 +1034,83 @@
         .filter(item => cleanText(item.name) || cleanText(item.description))
         .map(item => {
           const type = cleanText(item.type) || '未分类';
-          const category = cleanText(item.category);
+          const category = canonicalTag(item.category);
           const title = normalizeName(item.name || category || '未命名工具');
           const description = cleanText(item.description);
-          return {
+          const normalized = {
             uid: 'tools-' + item.id,
             module: 'tools',
             title,
             description,
             type,
-            tags: compactList([category]),
+            tags: canonicalList([category]),
             filterGroups: compactList([type]),
-            filterTags: compactList([category]),
+            filterTags: canonicalList([category]),
             rating: Number(item.rating) || 0,
             date: normalizeDate(item.updateTime),
             status: '',
             links: compactList([item.url]),
             searchText: [title, description, type, category].join(' ').toLowerCase()
           };
+          normalized.completenessScore = completenessScore([title, description, type, category, normalized.links, normalized.rating, normalized.date]);
+          normalized.level = classifyLevel(normalized);
+          return normalized;
         });
     }
 
     function normalizeWorkflows() {
-      return rawWorkflows.map(item => ({
-        uid: 'workflows-' + item.id,
-        module: 'workflows',
-        title: cleanText(item.title),
-        description: cleanText(item.content),
-        type: '工作流',
-        tags: compactList([...(item.software || []), ...(item.scenarios || [])]),
-        filterGroups: compactList(item.software),
-        filterTags: compactList(item.scenarios),
-        rating: 0,
-        date: normalizeDate(item.date),
-        status: '',
-        links: compactList(item.links),
-        searchText: [item.title, item.content, ...(item.software || []), ...(item.scenarios || [])].join(' ').toLowerCase()
-      }));
+      return rawWorkflows.map(item => {
+        const title = cleanText(item.title);
+        const description = cleanText(item.content);
+        const software = canonicalList(item.software);
+        const scenarios = canonicalList(item.scenarios);
+        const normalized = {
+          uid: 'workflows-' + item.id,
+          module: 'workflows',
+          title,
+          description,
+          type: '工作流',
+          tags: canonicalList([...software, ...scenarios]),
+          filterGroups: software,
+          filterTags: scenarios,
+          rating: 0,
+          date: normalizeDate(item.date),
+          status: '',
+          links: compactList(item.links),
+          searchText: [title, description, ...software, ...scenarios].join(' ').toLowerCase()
+        };
+        normalized.completenessScore = completenessScore([title, normalized.date, description, software, scenarios, normalized.links]);
+        normalized.level = classifyLevel(normalized);
+        return normalized;
+      });
     }
 
     function normalizePrompts() {
-      return rawPrompts.map(item => ({
-        uid: 'prompts-' + item.id,
-        module: 'prompts',
-        title: cleanText(item.title || item.prompt).slice(0, 80),
-        description: cleanText(item.prompt),
-        type: '提示词',
-        tags: compactList([...(item.types || []), item.status]),
-        filterGroups: compactList(item.types),
-        filterTags: compactList([item.status || '未标记']),
-        rating: Number(item.rating) || 0,
-        date: normalizeDate(item.date),
-        status: cleanText(item.status),
-        author: cleanText(item.author),
-        links: [],
-        searchText: [item.title, item.prompt, item.author, ...(item.types || []), item.status].join(' ').toLowerCase()
-      }));
+      return rawPrompts.map(item => {
+        const title = cleanText(item.title || item.prompt).slice(0, 80);
+        const description = cleanText(item.prompt);
+        const types = canonicalList(item.types);
+        const status = cleanText(item.status);
+        const normalized = {
+          uid: 'prompts-' + item.id,
+          module: 'prompts',
+          title,
+          description,
+          type: '提示词',
+          tags: canonicalList([...types, status]),
+          filterGroups: types,
+          filterTags: compactList([status || '未标记']),
+          rating: Number(item.rating) || 0,
+          date: normalizeDate(item.date),
+          status,
+          author: cleanText(item.author),
+          links: [],
+          searchText: [title, description, item.author, ...types, status].join(' ').toLowerCase()
+        };
+        normalized.completenessScore = completenessScore([title, description, types, normalized.author, normalized.rating || status]);
+        normalized.level = classifyLevel(normalized);
+        return normalized;
+      });
     }
 
     const dataStore = {
@@ -884,9 +1161,37 @@
         if (state.sort === 'latest') return (b.date || '').localeCompare(a.date || '') || (b.rating || 0) - (a.rating || 0);
         if (state.sort === 'name') return a.title.localeCompare(b.title, 'zh-CN');
         if (state.module === 'workflows') return (b.date || '').localeCompare(a.date || '');
-        return (b.rating || 0) - (a.rating || 0) || (b.date || '').localeCompare(a.date || '');
+        return rankScore(b) - rankScore(a) || (b.date || '').localeCompare(a.date || '');
       });
       return items;
+    }
+
+    function allItems() {
+      return Object.values(dataStore).flat();
+    }
+
+    function getFeaturedItems() {
+      const selected = [
+        ...dataStore.tools.filter(item => item.level === '精选').sort((a, b) => rankScore(b) - rankScore(a)).slice(0, 8),
+        ...dataStore.workflows.filter(item => item.level !== '待验证').sort((a, b) => rankScore(b) - rankScore(a)).slice(0, 3),
+        ...dataStore.prompts.filter(item => item.level === '精选' || item.rating >= 4).sort((a, b) => rankScore(b) - rankScore(a)).slice(0, 3)
+      ];
+      return selected.slice(0, 12);
+    }
+
+    function itemMatchesScene(item, scene) {
+      const haystack = normalizeForMatch([item.title, item.description, item.type, item.level, ...item.tags, ...item.filterGroups, ...item.filterTags].join(' '));
+      return scene.keywords.some(keyword => haystack.includes(normalizeForMatch(canonicalTag(keyword))));
+    }
+
+    function getSceneItems(sceneId, moduleName) {
+      const scene = sceneDefs.find(item => item.id === sceneId);
+      if (!scene) return [];
+      const source = moduleName ? dataStore[moduleName] : allItems();
+      return source
+        .filter(item => itemMatchesScene(item, scene))
+        .filter(item => !state.query || item.searchText.includes(state.query.toLowerCase()))
+        .sort((a, b) => rankScore(b) - rankScore(a));
     }
 
     function renderStats(items) {
@@ -894,11 +1199,79 @@
       const allWorkflows = dataStore.workflows.length;
       const allPrompts = dataStore.prompts.length;
       const highRating = dataStore.tools.filter(item => item.rating >= 4).length;
+      const totalAll = allTools + allWorkflows + allPrompts;
+      const currentDenominator = state.scene !== 'all'
+        ? totalAll
+        : (state.module === 'tools' ? allTools : state.module === 'workflows' ? allWorkflows : allPrompts);
       document.getElementById('stats').innerHTML =
         '<div class="stat-item"><div class="stat-num">' + allTools + '</div><div class="stat-label">工具</div></div>' +
         '<div class="stat-item"><div class="stat-num">' + highRating + '</div><div class="stat-label">高评分工具</div></div>' +
         '<div class="stat-item"><div class="stat-num">' + allWorkflows + '</div><div class="stat-label">工作流</div></div>' +
-        '<div class="stat-item"><div class="stat-num">' + items.length + '/' + (state.module === 'tools' ? allTools : state.module === 'workflows' ? allWorkflows : allPrompts) + '</div><div class="stat-label">当前结果</div></div>';
+        '<div class="stat-item"><div class="stat-num">' + items.length + '/' + currentDenominator + '</div><div class="stat-label">当前结果</div></div>';
+    }
+
+    function renderFeatured() {
+      const grid = document.getElementById('featuredGrid');
+      const items = getFeaturedItems();
+      grid.innerHTML = items.map(createCard).join('');
+      bindCards(grid);
+    }
+
+    function renderSceneNav() {
+      const nav = document.getElementById('sceneNav');
+      nav.innerHTML = sceneDefs.map(scene =>
+        '<button class="scene-card' + (state.scene === scene.id ? ' active' : '') + '" data-scene="' + escapeHTML(scene.id) + '">' +
+        '<div class="scene-title">' + escapeHTML(scene.title) + '</div>' +
+        '<div class="scene-desc">' + escapeHTML(scene.desc) + '</div>' +
+        '</button>'
+      ).join('');
+      nav.querySelectorAll('.scene-card').forEach(card => {
+        card.addEventListener('click', () => {
+          state.scene = card.dataset.scene;
+          resetFilters(true);
+          render();
+          document.getElementById('sceneResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    function renderSceneResults() {
+      const container = document.getElementById('sceneResults');
+      const scene = sceneDefs.find(item => item.id === state.scene);
+      if (!scene) {
+        container.classList.remove('active');
+        container.innerHTML = '';
+        return;
+      }
+
+      const groups = [
+        ['tools', '推荐工具'],
+        ['workflows', '相关工作流'],
+        ['prompts', '可复制提示词']
+      ].map(([moduleName, title]) => {
+        const items = getSceneItems(scene.id, moduleName).slice(0, moduleName === 'tools' ? 12 : 6);
+        if (!items.length) return '';
+        return '<section class="section">' +
+          '<div class="section-head"><div><h2 class="section-title">' + escapeHTML(title) + '</h2>' +
+          '<p class="section-desc">' + escapeHTML(scene.title) + ' · ' + items.length + ' 条</p></div></div>' +
+          '<div class="scene-grid">' + items.map(createCard).join('') + '</div>' +
+          '</section>';
+      }).join('');
+
+      const total = getSceneItems(scene.id).length;
+      container.classList.add('active');
+      container.innerHTML =
+        '<div class="scene-banner">' +
+        '<div><h2 class="section-title">' + escapeHTML(scene.title) + '</h2>' +
+        '<p class="section-desc">' + escapeHTML(scene.desc) + ' · 当前聚合 ' + total + ' 条内容</p></div>' +
+        '<button class="filter-btn scene-reset" id="clearScene">返回全部内容</button>' +
+        '</div>' +
+        (groups || '<div class="empty"><div class="empty-icon">🔍</div><p>当前场景暂无匹配内容</p></div>');
+      document.getElementById('clearScene').addEventListener('click', () => {
+        state.scene = 'all';
+        render();
+      });
+      bindCards(container);
     }
 
     function createCard(item) {
@@ -914,6 +1287,7 @@
         : link;
 
       return '<div class="card" data-uid="' + escapeHTML(item.uid) + '">' +
+        '<span class="level-badge ' + levelClass(item.level) + '">' + escapeHTML(item.level) + '</span>' +
         '<div class="card-img" style="background:' + grad + ';display:flex;align-items:center;justify-content:center;">' +
         '<span style="font-family:\'Noto Serif SC\',serif;font-size:2rem;font-weight:700;color:rgba(255,255,255,0.92);letter-spacing:0;">' + escapeHTML(icon) + '</span></div>' +
         '<div class="card-body">' +
@@ -924,6 +1298,18 @@
         '<span class="card-stars">' + (item.module === 'workflows' ? date : escapeHTML(getStars(item.rating))) + '</span>' +
         copy +
         '</div></div></div>';
+    }
+
+    function bindCards(root) {
+      root.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => openModal(card.dataset.uid));
+      });
+      root.querySelectorAll('.copy-card').forEach(btn => {
+        btn.addEventListener('click', event => {
+          event.stopPropagation();
+          copyText(btn.dataset.copy);
+        });
+      });
     }
 
     function render() {
@@ -937,9 +1323,26 @@
           ? '搜索工作流、软件或场景...'
           : '搜索提示词、作者或类型...';
 
+      document.getElementById('controlBar').style.display = state.scene === 'all' ? 'flex' : 'none';
+      document.getElementById('featuredSection').style.display = state.scene === 'all' ? 'block' : 'none';
+      document.getElementById('listSection').style.display = state.scene === 'all' ? 'block' : 'none';
+
       renderControls();
+      renderFeatured();
+      renderSceneNav();
+      renderSceneResults();
+
+      if (state.scene !== 'all') {
+        renderStats(getSceneItems(state.scene));
+        return;
+      }
+
       currentItems = getFilteredItems();
       renderStats(currentItems);
+      document.getElementById('listTitle').textContent = meta.title;
+      document.getElementById('listMeta').textContent = state.query || state.type !== 'all' || state.tag !== 'all' || state.rating !== 'all'
+        ? '筛选结果：' + currentItems.length + ' 条'
+        : '全部内容：' + currentItems.length + ' 条';
 
       if (!currentItems.length) {
         grid.innerHTML = '';
@@ -950,15 +1353,7 @@
 
       empty.style.display = 'none';
       grid.innerHTML = currentItems.map(createCard).join('');
-      grid.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', () => openModal(card.dataset.uid));
-      });
-      grid.querySelectorAll('.copy-card').forEach(btn => {
-        btn.addEventListener('click', event => {
-          event.stopPropagation();
-          copyText(btn.dataset.copy);
-        });
-      });
+      bindCards(grid);
     }
 
     function findItem(uid) {
@@ -978,6 +1373,10 @@
       const authorHtml = item.author ? '<div class="detail-label">作者</div><div class="modal-desc">' + escapeHTML(item.author) + '</div>' : '';
       const ratingHtml = item.module !== 'workflows' ? '<div class="detail-label">评分</div><div class="modal-desc">' + escapeHTML(getStars(item.rating)) + '</div>' : '';
       const statusHtml = item.status ? '<div class="detail-label">使用状态</div><div class="modal-desc">' + escapeHTML(item.status) + '</div>' : '';
+      const levelHtml = '<div class="detail-label">内容状态</div><div class="detail-row">' +
+        '<span class="card-tag primary">' + escapeHTML(item.level) + '</span>' +
+        '<span class="card-tag">完整度 ' + escapeHTML(item.completenessScore) + '%</span>' +
+        '</div>';
       const linksHtml = item.links.length ? '<div class="detail-label">链接</div><div class="detail-row">' + linkButtons(item.links) + '</div>' : '';
       const promptHtml = item.module === 'prompts'
         ? '<div class="detail-label">完整提示词</div><button class="copy-btn" onclick="copyTextFromModal()">复制提示词</button><div class="prompt-box" id="promptText">' + escapeHTML(item.description) + '</div>'
@@ -986,7 +1385,7 @@
       document.getElementById('modalInfo').innerHTML =
         '<h2 class="modal-title">' + escapeHTML(item.title) + '</h2>' +
         '<div class="detail-row">' + tagHtml + '</div>' +
-        authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml;
+        levelHtml + authorHtml + dateHtml + ratingHtml + statusHtml + promptHtml + linksHtml;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -1044,6 +1443,7 @@
         document.querySelectorAll('.module-tab').forEach(item => item.classList.remove('active'));
         tab.classList.add('active');
         state.module = tab.dataset.module;
+        state.scene = 'all';
         resetFilters(true);
         render();
       });
