@@ -24,16 +24,25 @@ export default {
     }
 
     return jsonResponse({ ok: false, error: 'not_found' }, 404);
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(refreshCache(env));
   }
 };
+
+async function refreshCache(env) {
+  const data = await fetchFeishuResources(env);
+  await writeCache(env, data);
+  return data;
+}
 
 async function getResources(env, force) {
   const cached = await readCache(env);
   if (!force && cached) return jsonResponse({ ok: true, source: 'cache', data: cached });
 
   try {
-    const data = await fetchFeishuResources(env);
-    await writeCache(env, data);
+    const data = await refreshCache(env);
     return jsonResponse({ ok: true, source: 'feishu', data });
   } catch (error) {
     if (cached) {

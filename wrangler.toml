@@ -17,3 +17,6 @@ compatibility_date = "2026-05-01"
 # [[kv_namespaces]]
 # binding = "AI_TOOLKIT_CACHE"
 # id = "replace_with_cloudflare_kv_namespace_id"
+
+[triggers]
+crons = ["0 */6 * * *"]

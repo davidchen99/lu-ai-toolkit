@@ -163,6 +163,10 @@
       box-shadow: 0 0 0 3px rgba(196, 164, 132, 0.12);
     }
 
+    .filter-toggle {
+      display: none;
+    }
+
     /* Main Grid */
     main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
 
@@ -599,6 +603,12 @@
       .module-tab { flex: 1; padding: 0.5rem 0.75rem; }
       .filter-bar { padding: 0.8rem; justify-content: flex-start; }
       .control-select, .filter-btn { flex: 1 1 42%; min-width: 0; }
+      .filter-toggle { display: block; flex: 1 1 100%; }
+      .filter-bar.collapsed .control-select,
+      .filter-bar.collapsed #clearFilters,
+      .filter-bar.collapsed #maintenanceToggle {
+        display: none;
+      }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .featured-grid, .scene-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .scene-nav { grid-template-columns: 1fr; }
@@ -623,7 +633,8 @@
     </div>
   </header>
 
-  <div class="filter-bar" id="controlBar">
+  <div class="filter-bar collapsed" id="controlBar">
+    <button class="filter-btn filter-toggle" id="filterToggle">展开筛选</button>
     <select class="control-select" id="typeFilter"></select>
     <select class="control-select" id="tagFilter"></select>
     <select class="control-select" id="ratingFilter"></select>
@@ -1649,6 +1660,12 @@
     document.getElementById('maintenanceToggle').addEventListener('click', () => {
       document.getElementById('maintenanceSection').classList.toggle('active');
       renderMaintenance();
+    });
+
+    document.getElementById('filterToggle').addEventListener('click', () => {
+      const bar = document.getElementById('controlBar');
+      bar.classList.toggle('collapsed');
+      document.getElementById('filterToggle').textContent = bar.classList.contains('collapsed') ? '展开筛选' : '收起筛选';
     });
 
     document.getElementById('modal').addEventListener('click', e => {
