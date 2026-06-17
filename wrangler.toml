@@ -3,7 +3,6 @@ account_id = "8150f75031ca45ef5ae7f1072741ac88"
 main = "worker/index.js"
 compatibility_date = "2026-05-01"
 workers_dev = true
-pages_build_output_dir = "_site"
 
 # Required Worker secrets:
 # wrangler secret put FEISHU_APP_ID
